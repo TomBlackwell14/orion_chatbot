@@ -1,0 +1,621 @@
+SAL-001 — URGENCIA MÉDICA GENERAL
+
+ID Subcategoría: 1 — Urgencia
+Categoría: Salud
+Especialidad Respondedor: TENS / Personal de Salud
+Prioridad: Alta — se eleva a Crítica de forma inmediata si compromete respiración, conciencia o circulación.
+
+SAL-001 — URGENCIA MÉDICA GENERAL
+
+Activación: Se activa cuando se reporta alteración de salud súbita, lesión por accidente o agravamiento repentino que pone en riesgo la vida, la conciencia, la respiración o la integridad física de una persona.
+
+Comprende: pérdida total o parcial del conocimiento, dificultad evidente o progresiva para respirar, dolor intenso que no cede con reposo, hemorragia activa que no se detiene con presión directa, aparición súbita de debilidad, confusión, parálisis o alteración de lenguaje, colapso sin causa aparente, o cualquier síntoma que aparezca de forma repentina y empeore progresivamente en cuestión de minutos. Es también el protocolo base cuando el cuadro reportado no coincide con ninguno de los protocolos específicos existentes pero denota gravedad a la salud del individuo.
+
+Verificación de seguridad: El sistema debe indicar al reportante que evalúe si el entorno es seguro: identificar riesgo de caída de objetos, humo, gases, sustancias peligrosas, tensión eléctrica, tráfico o superficies inestables. Si el lugar no es seguro, el reportante no debe ingresar ni exponerse: debe solicitar asistencia desde zona protegida. La seguridad del entorno es condición previa indispensable según principios de evaluación de riesgo previa de Sernapred.
+
+Datos que el sistema debe recabar del reportante:
+¿La persona afectada responde de forma coherente al llamado, al contacto físico o mantiene orientación en tiempo, lugar y persona?
+¿Se observa respiración de forma normal, lenta, acelerada, ruidosa, con esfuerzo evidente o no se aprecia movimiento respiratorio alguno?
+¿Qué síntoma o señal es la más predominante? ¿Puede indicar qué siente o qué le ocurre?
+¿En qué momento comenzó el cuadro? ¿Fue de aparición súbita o progresiva?
+¿Se identifica causa probable: golpe, caída, esfuerzo, alimento, medicamento, picadura, o sin causa reconocible?
+¿Existen antecedentes conocidos de enfermedades crónicas, alergias, medicación habitual o tratamiento en curso?
+¿Hay otras personas afectadas o el entorno presenta algún peligro que deba comunicarse de inmediato?
+
+Acciones que el sistema debe ejecutar:
+Activar notificación inmediata al servicio de salud del campus con indicación precisa de ubicación, número de personas afectadas y naturaleza del cuadro reportado.
+Si se confirma pérdida de conocimiento, ausencia de respiración o compromiso circulatorio: elevar prioridad a Crítica y activar cadena de alerta oficial para que personal autorizado evalúe si corresponde contactar a servicios externos.
+Transmitir al personal de respuesta todos los datos recabados: ubicación exacta, estado de la persona, síntomas, hora de inicio y factores de riesgo.
+Mantener al reportante informado sobre tiempo estimado de llegada del personal de respuesta.
+
+Indicaciones que el sistema debe entregar al reportante:
+ORION es una guía de apoyo. No sustituye a personal de salud ni a servicios de emergencia. El personal correspondiente ya ha sido notificado. Manténgase en lugar seguro y espere asistencia. Si la situación empeora considerablemente, indíquelo de inmediato por este mismo medio. 
+
+Si la persona mantiene conciencia: permitirle posición de reposo, preferentemente sentada o semisentada, evitando esfuerzo físico.
+Mantener zona alrededor completamente despejada, sin aglomeraciones y con paso libre.
+Aflojar prendas ajustadas en cuello, pecho y cintura.
+NO dar agua, alimentos, medicamentos ni remedios de ningún tipo.
+NO mover, trasladar ni levantar a la persona si no es estrictamente indispensable.
+NO introducir objeto alguno en su boca.
+Observar continuamente respiración y respuesta, y mantenerse acompañando a la persona sin abandonarla hasta que llegue la ayuda.[1.1]
+
+Información que el sistema debe registrar y transmitir al equipo de respuesta:
+Estado de conciencia: responde y orienta, confundida pero responde, solo reacciona ante dolor, o no responde.
+Condición respiratoria: normal, lenta, acelerada, ruidosa o ausente.
+Síntoma principal y manifestaciones acompañantes.
+Tiempo de evolución y si empeora, se mantiene o mejora.
+Hallazgos visibles: golpes, heridas, coloración, debilidad o cualquier señal externa.
+Antecedentes conocidos si han sido informados.
+Peligros del entorno o factores que afecten el ingreso.
+
+Criterios de escalamiento automático:
+Se eleva a prioridad Crítica y se activa cadena de alerta oficial si se confirma cualquiera de estas condiciones:
+La persona afectada no responde ante estímulo alguno ni abre los ojos de forma sostenida.
+No respira o su respiración es muy lenta, irregular, ruidosa o se detiene.
+Coloración azulada, violácea o palidez extrema en labios, cara o piel general.
+Dolor intenso y continuo en región precordial que no cede con reposo.
+Sangrado o hemorragia abundante que no disminuye tras cinco minutos de presión.
+Pérdida súbita de conocimiento que no se recupera tras unos segundos.
+Dificultad para hablar, lenguaje ininteligible, debilidad de un lado del cuerpo o confusión repentina.
+Empeoramiento evidente y rápido en cuestión de minutos descrito por el reportante.
+
+Mientras llega ayuda especializada: vigilar respiración y estado de conciencia de forma continua, no administrar nada por vía oral y mantener a la persona en posición adecuada según su estado. 
+SAL-002 — MALESTAR / SÍNTOMAS SIN EMERGENCIA GRAVE
+
+ID Subcategoría: 2 — Malestar
+Categoría: Salud
+Especialidad Respondedor: TENS
+Prioridad: Media — se eleva a Alta si empeora progresivamente o aparece compromiso de conciencia o respiración
+
+Activación: Se activa cuando se reporta alteración de salud de aparición súbita que genera molestia, PERO la persona mantiene conciencia, respira sin dificultad y NO presenta lesión visible por golpe, caída ni accidente. Comprende: mareo, dolor de cabeza, cansancio extremo, debilidad general, molestia localizada sin causa aparente, náuseas sin vómito incontrolable, visión borrosa transitoria, o cualquier síntoma desagradable pero que permite mantenerse consciente, orientado y respirando sin esfuerzo.
+
+NO se activa este protocolo si: hay golpe, caída, corte o quemadura → usar SAL-003. Hay llanto intenso, angustia o conducta inusual → usar SAL-004. Pierde conocimiento, cuesta respirar o empeora rápidamente → activar SAL-001 de inmediato.
+
+Verificación de seguridad: El sistema debe indicar al reportante que confirme que el entorno es seguro y que no existe riesgo de caída, tropiezo, tráfico o exposición a sustancias. Si la persona se encuentra en zona de riesgo, indicar traslado a lugar seguro y ventilado, siempre que su estado lo permita sin agravar el cuadro.
+
+Datos que el sistema debe recabar del reportante:
+
+¿La persona mantiene conciencia, responde con coherencia y se encuentra orientada en tiempo, lugar y persona?
+¿Respira de forma normal, sin dificultad y sin esfuerzo visible?
+¿Qué síntoma manifiesta con mayor intensidad? ¿Puede señalar dónde siente dolor o molestia?
+¿Hace cuánto comenzó? ¿Fue súbito o progresivo?
+¿Se identifica causa probable: esfuerzo físico, calor, falta de alimento o hidratación, cansancio, o sin causa reconocible?
+¿Ha sufrido golpe, caída o lesión en horas previas que pudiera relacionarse?  Si responde SÍ → detener y activar SAL-003
+¿Existen antecedentes conocidos de enfermedades, alergias o medicación habitual?
+
+Acciones que el sistema debe ejecutar:
+Notificar al servicio de salud del campus con indicación de ubicación, síntoma reportado y estado de la persona.
+Si el cuadro empeora o aparecen signos de gravedad: elevar prioridad y activar de inmediato el protocolo SAL-001.
+Transmitir al personal de respuesta: ubicación, síntoma principal, tiempo de evolución y causa probable.
+Orientar al reportante sobre medidas de reposo e hidratación mientras llega asistencia.
+
+Indicaciones que el sistema debe entregar al reportante:
+ORION es una guía de apoyo. No sustituye a personal de salud ni a servicios de emergencia. El personal correspondiente ya ha sido notificado. Manténgase en lugar seguro y espere asistencia. Si la situación empeora considerablemente, indíquelo de inmediato por este mismo medio.
+Indicar a la persona posición de reposo en lugar fresco, ventilado y seguro.
+Aflojar prendas ajustadas en cuello, pecho y cintura en caso de sentir presión en dichas áreas.
+NO dar alimentos, medicamentos ni remedios de ningún tipo.
+NO obligar a moverse, caminar o cambiar de posición si refiere mareo o debilidad.
+Mantenerla acompañada. No dejarla sola si refiere mareo intenso o inestabilidad.
+Observar si mejora, se mantiene igual o empeora con el paso de los minutos.
+
+Información que el sistema debe registrar y transmitir al equipo de respuesta:
+Ubicación precisa: edificio, piso, sala o punto de referencia.
+Estado de conciencia y orientación: responde coherente, sin alteración evidente.
+Síntoma principal y zona afectada.
+Tiempo de evolución y si ha mejorado, se mantiene o empeora.
+Causa probable: esfuerzo, calor, falta de alimento o hidratación, o sin causa identificable.
+Medidas adoptadas: reposo, hidratación, y si se observó cambio tras ellas.
+
+Criterios de escalamiento automático — activar SAL-001 si se confirma cualquiera de estas condiciones:
+La persona pierde el conocimiento, aunque sea por segundos.
+Aparece dificultad para respirar, dolor intenso, confusión o alteración del lenguaje.
+El malestar empeora de forma evidente y progresiva en cuestión de minutos.
+Se presenta vómito incontrolable, visión doble, debilidad en extremidades o desmayo.
+.
+
+SAL-003 — LESIONES POR ACCIDENTE, GOLPE O CAÍDA
+
+ID Subcategoría: 3 — Lesiones / Accidentes
+Categoría: Salud
+Especialidad Respondedor: TENS
+Prioridad: Alta — se eleva a Crítica si hay hemorragia abundante, pérdida de conocimiento, sospecha de lesión de columna o fractura visible
+
+Activación: Se activa cuando se reporta golpe, caída, impacto, corte, quemadura o lesión visible de aparición súbita. Comprende: herida con o sin sangrado, inflamación o deformidad tras impacto, incapacidad para mover una parte del cuerpo, golpe en cabeza o cuello, caída desde altura o a nivel con dolor persistente, quemadura por calor o sustancia. El elemento definitorio es que existe un mecanismo visible de lesión.
+
+NO se activa este protocolo si: no hay golpe ni lesión visible y solo hay malestar → usar SAL-002. Hay llanto o crisis emocional sin lesión física → usar SAL-004. Aparece pérdida de conocimiento o dificultad para respirar → activar SAL-001 de inmediato.
+Verificación de seguridad: Confirmar que el entorno no presenta riesgo de nuevos golpes, caída de objetos, tráfico, superficies inestables o sustancias peligrosas. Indicar al reportante que NO traslade a la persona si existe riesgo, y que se mantenga en zona segura hasta llegada de asistencia.
+
+Datos que el sistema debe recabar del reportante:
+¿La persona afectada responde de forma coherente y se mantiene consciente? Si NO responde → detener y activar SAL-001
+¿Respira sin dificultad visible? Si NO respira bien → detener y activar SAL-001
+¿Qué parte del cuerpo recibió el impacto o presenta lesión?
+¿Se observa sangrado, deformidad, herida abierta o cambio de coloración?
+¿Cómo ocurrió el suceso? ¿Caída, golpe, corte, quemadura, objeto pesado?
+¿Puede mover la zona afectada voluntariamente o manifiesta que no puede?
+¿Refiere dolor en cuello, espalda o cabeza además de la zona visible?
+
+Acciones que el sistema debe ejecutar:
+Activar notificación inmediata al servicio de salud del campus con indicación de ubicación, tipo de lesión y gravedad reportada.
+Si se confirma sangrado abundante, deformidad, golpe en cabeza o pérdida de conocimiento: elevar prioridad a Crítica y activar SAL-001.
+Transmitir al personal de respuesta todos los datos recabados: ubicación exacta, mecanismo de lesión, zona afectada y estado de la persona.
+Indicar al reportante las medidas de asistencia según corresponda: presión sobre herida, no mover a la persona, cubrir zona afectada, mantener reposo.
+Mantener el reportante informado sobre tiempo estimado de llegada del personal de respuesta.
+
+Indicaciones que el sistema debe entregar al reportante:
+ORION es una guía de apoyo. No sustituye a personal de salud ni a servicios de emergencia. El personal correspondiente ya ha sido notificado. Manténgase en lugar seguro y espere asistencia. Si la situación empeora considerablemente, indíquelo de inmediato por este mismo medio.
+Aplicar presión firme sobre zona que sangra, usando tela limpia y sin retirar el material.
+NO mover ni trasladar a la persona si hay golpe en cabeza, cuello, espalda o deformidad visible.
+Cubrir herida abierta con tela limpia sin introducir nada dentro.
+Mantenerse acompañando a la persona, vigilar que respira bien y que no pierda el conocimiento hasta que llegue personal especializado.
+No dejar sola a la persona en ningún momento.
+
+Información que el sistema debe registrar y transmitir al equipo de respuesta:
+Ubicación precisa: edificio, piso, sala o punto de referencia.
+Mecanismo de lesión: caída, golpe, corte, quemadura u otro.
+Zona del cuerpo afectada y señales observadas: sangrado, deformidad, herida, quemadura.
+Estado de conciencia y respiración al momento del reporte.
+Hora aproximada del suceso.[2.1]
+Si se ha trasladado a la persona de su posición original.
+
+Criterios de escalamiento automático — elevar a Crítica y activar SAL-001 si se confirma cualquiera de estas condiciones:
+Sangrado que no cede tras cinco minutos de presión.
+Pérdida de conocimiento, aunque sea breve.
+Deformidad visible o imposibilidad total de movimiento.
+Golpe en cabeza, cuello o columna acompañado de confusión, mareo, visión borrosa o entumecimiento.
+Quemadura extensa o que afecta cara, manos, articulaciones.
+Entumecimiento, hormigueo o debilidad en extremidades tras caída o golpe.
+Dolor intenso que aumenta o se extiende a otras zonas.
+Confusión, somnolencia, vómito o dificultad para hablar tras el golpe.
+
+Si no se activa escalamiento crítico: se mantiene prioridad Alta, se notifica al personal de salud del campus y se orienta al reportante.
+
+SAL-004 — CRISIS EMOCIONAL / SALUD MENTAL
+ID Subcategoría: 4 — Salud Mental / Emocional
+Categoría: Salud
+Especialidad Respondedor: TENS (quienes coordinan con Psicólogo)
+Prioridad: Media — se eleva a Alta si existe riesgo de autolesión, agresividad o descontrol; se eleva a Crítica si hay amenaza concreta o intento
+
+Activación: Se activa cuando se reporta llanto incontrolable, angustia intensa, dificultad para respirar por nerviosismo, temblor generalizado, expresiones de desesperanza, conducta inusual, amenaza de autolesión o crisis que impide comunicarse o mantenerse en calma. El elemento definitorio es que el origen es emocional o de conducta, no existe lesión física por golpe ni causa orgánica aparente.
+
+NO se activa este protocolo si: hay golpe, caída o lesión visible → usar SAL-003. Hay síntomas físicos sin causa emocional → usar SAL-001 o SAL-002 según corresponda. La persona pierde el conocimiento o su estado se descompensa físicamente → activar SAL-001 de inmediato.
+
+Verificación de seguridad: El sistema debe indicar al reportante que evalúe si el entorno es seguro: verificar que no existan objetos cortantes, sustancias peligrosas, altura o elementos que puedan ser usados para daño. Si la persona se encuentra en zona de riesgo, indicar traslado a lugar tranquilo sin oponer resistencia ni confrontación.
+
+Datos que el sistema debe recabar del reportante:
+¿La persona mantiene contacto y comunicación, o se encuentra desconectada, agresiva o sin responder? Si NO responde físicamente → verificar respiración y activar SAL-001
+¿Respira de forma normal o acelerada por esfuerzo emocional?
+¿Qué manifestación presenta: llanto, temblor, silencio, amenaza, inmovilidad?
+¿Hace cuánto comenzó y existe detonante conocido?
+¿Existe riesgo concreto de que se dañe a sí misma o a otras personas?
+¿Ha recibido atención psicológica o tratamiento en curso?
+¿Se encuentra acompañada por persona de confianza?
+
+Acciones que el sistema debe ejecutar:
+Notificar al profesional de psicología del campus con ubicación, tipo de crisis y nivel de riesgo.
+Si hay amenaza de autolesión o agresividad: elevar prioridad a Alta y coordinar con seguridad del campus.
+Si hay riesgo inminente o intento: elevar a Crítica y activar cadena de alerta.
+Transmitir datos al equipo de respuesta e indicar al reportante forma correcta de aproximarse.
+
+Indicaciones que el sistema debe entregar al reportante:
+ORION es una guía de apoyo. No sustituye a atención profesional ni a servicios de emergencia. El personal correspondiente ya ha sido notificado. Manténgase en lugar seguro y espere asistencia. Si la situación se vuelve peligrosa o empeora, indíquelo de inmediato.
+Acercarse con calma, hablar en tono suave y frases cortas. Evitar aglomeraciones y presión.
+Invitar a respirar lento: inhalar, sostener, soltar. Sin exigir.
+Acompañar sin juzgar. NO decir "no llores" ni "cálmate".
+Mantener distancia si hay agitación. NO tocar sin consentimiento.
+NO dejar sola si hay riesgo. NO dar medicamentos ni bebidas.
+
+Información que el sistema debe registrar y transmitir al equipo de respuesta:
+Ubicación precisa: edificio, piso, sala o punto de referencia.
+Tipo de manifestación: llanto, silencio, agitación, amenaza, u otro.
+Tiempo de inicio y detonante si se conoce.
+Nivel de riesgo: sin riesgo / expresión de desesperanza / amenaza / intento.
+Si hay persona de confianza acompañando.
+Medidas adoptadas por el reportante y respuesta de la persona.
+
+Criterios de escalamiento automático:
+ A Alta: Si hay amenaza de autolesión, agresividad hacia otros o descontrol extremo. Notificar a Psicólogo + Seguridad.
+ A Crítica y activar SAL-001: Si hay intento concreto, exposición deliberada a peligro, o colapso físico acompañante. Notificar a seguridad, salud y cadena oficial.
+Mientras llega ayuda: mantener entorno tranquilo, sin multitudes, acompañar sin confrontar y vigilar seguridad. Si la persona pierde el conocimiento o deja de respirar → activar SAL-001 de inmediato.
+
+INF-001 — INCENDIO O EXPLOSIÓN
+
+ID Subcategoría: 5 — Incendio / Explosión
+Categoría: Infraestructura
+Especialidad Respondedor: Prevencionista de Riesgos
+Prioridad: Alta — se eleva a Crítica si hay propagación visible, humo denso, personas atrapadas o riesgo de explosión inminente
+
+Activación: Se activa cuando se reporta fuego, llamas, humo anormal, olor a combustible o gas, estallido, detonación, onda expansiva o cualquier riesgo de explosión. Comprende: fuego contenido en equipo o recipiente, fuego que se propaga, humo denso, olor fuerte a gas sin causa identificable, calentamiento excesivo de instalaciones, o estallido de cualquier material.
+
+NO se activa este protocolo si: solo hay corte de luz o falla eléctrica específica SIN fuego ni humo visible → usar INF-002. Hay grietas o daño estructural SIN fuego → usar INF-003. El origen es sismo o orden de evacuación general → usar INF-004.
+SI HAY FUEGO O HUMO VISIBLE → SIEMPRE INF-001, sin importar otras fallas. Si hay personas heridas o atrapadas → activar también SAL-001 de inmediato.
+
+Verificación de seguridad: El sistema debe indicar al reportante que NO ingrese ni se acerque. Mantener distancia mínima de 15 metros para fuego pequeño, mayor si hay humo o riesgo de expansión. NO tocar interruptores, NO encender luces. Si hay olor a gas: no encender llamas, no accionar interruptores. Alejarse por zona segura y ventilar desde fuera.
+
+Datos que el sistema debe recabar:
+¿Se observa fuego, humo o ambos? ¿De qué color y densidad?
+¿En qué lugar exacto se originó o se observa con mayor intensidad?
+¿Qué materiales se están quemando o podrían estar involucrados?
+¿Existe riesgo de propagación a techos, ductos, depósitos o instalaciones eléctricas?
+¿Hay personas dentro, atrapadas o que no logran salir? Si SÍ → activar SAL-001
+¿Se escuchó estallido o se observa recipiente inflado o caliente?
+¿Se intentó apagar sin éxito? ¿Hay extintor disponible y se sabe usarlo?
+
+Acciones que el sistema debe ejecutar:
+
+Notificar de inmediato a Prevencionista de Riesgos y seguridad del campus.
+Si hay fuego visible, humo denso, personas atrapadas o riesgo de explosión → elevar a Crítica y llamar al Cuerpo de Bomberos.
+Notificar a zonas aledañas para que cierren puertas y no se acerquen.
+Transmitir ubicación, magnitud, materiales involucrados, personas afectadas y vías de acceso.
+Indicar al reportante vía de evacuación más cercana y punto de encuentro seguro.
+
+
+Indicaciones al reportante:
+ORION es una guía de apoyo. No sustituye a Bomberos ni servicios de emergencia oficiales. El personal ya ha sido notificado. Alejarse de inmediato por vía segura. Si la situación empeora o hay personas en riesgo, indíquelo de inmediato.
+Grita a viva voz dando alerta del incendio si puedes.  
+informe al anexo de emergencia n° 999, desde celulares marcando 32 – 2277999 
+Si es posible efectúe la primera intervención utilizando extintores o redes húmedas más cercanas. 
+Alejarse sin detenerse a recoger objetos si ve peligro inmediato.
+Cerrar puertas al salir para contener humo y fuego. NO cerrar con llave.
+Si hay humo: desplazarse agachado, cubrir nariz y boca con tela húmeda.
+NO usar ascensores. Usar escaleras.
+Si se intentó apagar y no se logró: alejarse de inmediato.
+Si hay sospecha de gas: no accionar interruptores ni dispositivos eléctricos. Alejarse y ventilar desde fuera.
+
+Información a transmitir al equipo:
+Ubicación precisa: edificio, piso, sala o zona.
+Tipo de señal observada: fuego, humo, olor, estallido.
+Magnitud: contenido, en expansión, localizado o generalizado.
+Materiales o instalaciones involucradas si se identifican.
+Personas afectadas o en riesgo: cantidad, ubicación, si salieron.
+Vías de acceso y posibles obstáculos.
+
+Criterios de escalamiento automático → elevar a Crítica si:
+Fuego se propaga a techos, ductos, depósitos o múltiples ambientes.
+Humo negro, denso, que impide visibilidad o desplazamiento.
+Olor a gas o combustible intenso y generalizado sin causa identificable.
+Recipiente, tanque o equipo que se calienta excesivamente o se infla.
+Estallido previo o riesgo de explosión por gases o sustancias.
+Personas atrapadas, heridas o que no logran salir.
+Instalación eléctrica en llamas o adyacente al fuego.
+Mientras llega asistencia: mantener distancia, indicar evacuación, cerrar puertas, no permitir reingreso hasta autorización oficial.
+
+INF-002 — FALLA O CORTE DE SERVICIOS BÁSICOS
+
+ID Subcategoría: 6 — Servicios Básicos
+Categoría: Infraestructura
+Especialidad Respondedor: Personal de Mantenimiento
+Prioridad: Media — se eleva a Alta si afecta zonas críticas, laboratorios, salas de salud o genera riesgo eléctrico
+
+Activación: Se activa cuando se reporta corte o falla de suministro eléctrico, agua, gas, alcantarillado o iluminación en zonas de circulación. Comprende: apagón parcial o total, intermitencia eléctrica peligrosa, falta de agua en zonas críticas, rotura de cañería o desborde que afecte circulación.
+
+NO se activa este protocolo si: hay fuego, humo o riesgo de explosión → usar INF-001. Hay grietas o daño estructural → usar INF-003. El corte es consecuencia de sismo o desastre → usar INF-004.
+SI APARECE FUEGO O HUMO → DETENER Y ACTIVAR INF-001. Si hay personas lesionadas por la falla → activar SAL-001.
+
+Verificación de seguridad: El sistema debe indicar al reportante que NO manipule interruptores, tableros, llaves de paso ni intente reparaciones. Si hay olor a gas o sospecha de fuga: NO encender luces, NO usar interruptores ni celulares. Alejarse y ventilar desde fuera.
+Datos que el sistema debe recabar:
+¿Qué servicio falla o se interrumpió? ¿En qué zona exacta?
+¿Es total o parcial? ¿Afecta un sector o todo el edificio?
+¿Se observa daño visible: cables rotos, agua desbordada, chispas?
+¿Existe riesgo inmediato: personas a oscuras, equipos funcionando, sustancias expuestas?
+¿Afecta laboratorios, salas de salud, cocinas o zonas críticas?
+¿Hace cuánto se produjo y hubo evento previo?
+
+Acciones que el sistema debe ejecutar:
+Notificar a Mantenimiento con ubicación, tipo de falla y gravedad.
+Si hay riesgo eléctrico, gas o afectación a zonas críticas → elevar a Alta.
+Transmitir datos al equipo e indicar que NO se manipule instalaciones.
+Si aparece fuego o riesgo de explosión → detener y activar INF-001.
+
+Indicaciones al reportante:
+ORION es una guía de apoyo. No sustituye a personal técnico ni servicios de emergencia. El personal de mantenimiento ya ha sido notificado. No manipule instalaciones y espere asistencia.
+NO manipular interruptores, tableros ni llaves de paso.
+Si hay sospecha de gas: ventilar abriendo puertas y ventanas desde fuera. NO usar interruptores ni llamar desde el lugar.
+Si hay cables caídos o agua sobre instalación eléctrica → NO acercarse.
+Avisar a personas cercanas para que eviten la zona.
+NO intentar reparación propia.
+
+Información a transmitir al equipo:
+Ubicación precisa: edificio, piso, sector.
+Tipo de servicio afectado y alcance: parcial o total.
+Daños visibles observados.
+Zonas críticas comprometidas.
+Tiempo de inicio y condiciones de aparición.
+
+Criterios de escalamiento automático → elevar a Alta si:
+Hay olor a gas o sospecha de fuga.
+Cables caídos o agua sobre instalación eléctrica.
+Afecta laboratorios, salas de salud o equipos críticos.
+Oscuridad total en zonas de circulación con personas presentes.
+Riesgo de incendio por falla eléctrica visible.
+
+INF-003 — RIESGO ESTRUCTURAL
+
+ID Subcategoría: 7 — Riesgo Estructural
+Categoría: Infraestructura
+Especialidad Respondedor: Prevencionista de Riesgos
+Prioridad: Baja — se eleva a Crítica si hay desplome inminente, grietas progresivas o personas en zona de riesgo
+
+Activación: Se activa cuando se observa grietas importantes en muros, techos o columnas, desprendimiento de materiales, inclinación de estructura, o ruido anormal que sugiere falla constructiva. Comprende también árboles o postes inclinados que puedan caer sobre personas o vías.
+
+NO se activa este protocolo si: el daño fue causado por fuego, explosión o estallido → usar INF-001. El daño apareció por sismo o desastre natural → usar INF-004. Solo hay caída de revestimiento sin riesgo estructural → reportar a mantenimiento.
+SI HAY PERSONAS ATRAPADAS O HERIDAS → activar también SAL-001.
+Verificación de seguridad: El sistema debe indicar al reportante que NO ingrese ni se acerque. Mantener distancia prudencial: mínimo la altura estimada de la estructura. Evitar paso por debajo.
+
+Datos que el sistema debe recabar:
+¿Qué se observa: grietas, desplome, inclinación, desprendimiento, ruido?
+¿En qué edificio, zona o punto exacto? ¿Es muro, techo, columna o exterior?
+¿Se observa movimiento progresivo o empeoramiento?
+¿Hay personas dentro, debajo o en zona de riesgo? Si SÍ → elevar a Crítica
+¿Se escuchó estallido previo o ruido de fractura?
+
+Acciones que el sistema debe ejecutar:
+Notificar a Prevencionista de Riesgos y seguridad del campus con ubicación y gravedad.
+Si hay personas en zona de riesgo o desplome progresivo → elevar a Crítica y activar evacuación inmediata.
+Transmitir datos e indicar que se impida acceso al área.
+
+Indicaciones al reportante:
+ORION es una guía de apoyo. No permita acceso al área. El personal calificado ya ha sido notificado. Alejarse y advertir a otros.
+Alejarse y evitar que otras personas pasen o ingresen.
+NO tocar ni intentar sostener nada.
+Si hay personas dentro: indicarles que salgan por ruta alejada de la zona afectada.
+NO regresar hasta que se evalúe seguridad.
+Información a transmitir al equipo:
+Ubicación exacta: edificio, piso, punto de referencia.
+Tipo de daño observado y tamaño estimado.
+Presencia de personas y evolución del daño.
+Vías de acceso restringidas.
+
+Criterios de escalamiento automático → elevar a Crítica si:
+Personas dentro o debajo de zona de riesgo.
+Desplome progresivo o movimiento visible.
+Ruido de fractura o estallido estructural.
+Caída inminente de techos, muros o elementos estructurales.
+
+INF-004 — EVACUACIÓN O DESASTRE NATURAL
+
+ID Subcategoría: 8 — Evacuación / Desastre Natural
+Categoría: Infraestructura
+Especialidad Respondedor: Prevencionista de Riesgos
+Prioridad: Alta — se eleva a Crítica automáticamente ante sismo fuerte, alerta de tsunami o orden oficial de evacuación
+
+Activación: Se activa ante sismo perceptible, alerta oficial de tsunami, amenaza natural o instrucción formal de evacuar. Comprende: movimiento sísmico, aviso de autoridad, orden de evacuación por cualquier causa mayor, o necesidad de guiar a personas hacia zonas de seguridad.
+
+NO se activa este protocolo si: la evacuación es por fuego o fuga → usar INF-001. Es por corte de servicios → usar INF-002. Es por daño estructural aislado → usar INF-003.
+DESPUÉS DEL SISMO: Si hay fuego → INF-001. Si hay daño estructural → INF-003. Si hay cortes → INF-002. Si hay heridos → SAL-001. Este protocolo guía LA EVACUACIÓN; las consecuencias se atienden con los protocolos correspondientes.
+Verificación de seguridad: El sistema debe indicar al reportante que se mantenga en lugar seguro. Si hay sismo en curso: agacharse, cubrirse cabeza y cuello, sostenerse. No correr, no usar ascensores, no salir precipitadamente hasta que cese el movimiento.
+
+Datos que el sistema debe recabar:
+¿Tipo de evento: sismo, alerta oficial, orden de evacuación u otro?
+¿Intensidad percibida: leve, moderada, fuerte?
+¿Hay daños visibles en instalaciones o personas afectadas? ⚠️ Si hay fuego/grietas → activar protocolo correspondiente
+¿Se desconoce si todos salieron de edificios?
+¿Se requiere apoyo para evacuar a personas con movilidad reducida?
+Acciones que el sistema debe ejecutar:
+Activar protocolo de evacuación, notificar a seguridad y personal de respuesta.
+Si hay orden oficial o evento de gran intensidad → elevar a Crítica y activar cadena de alerta completa.
+Transmitir instrucciones de evacuación, zonas de seguridad y puntos de encuentro.
+Coordinar con INF-001/002/003 según daños reportados tras el evento.
+
+Indicaciones al reportante:
+ORION es una guía de apoyo. Siga indicaciones de evacuación oficial. No regrese hasta que se autorice. Reporte cualquier daño o persona sin contabilizar.
+Mantenga la calma, aléjese de puertas, ventanales y estructuras colgantes.
+Por ningún motivo salga corriendo a la calle.
+Evacúe solo una vez terminado el sismo; si se encuentra al exterior de los edificios, aléjese de árboles, techumbres y poste de alumbrado público.
+NO usar ascensores.
+Alejarse de edificios, postes, cables y muros altos.
+Dirigirse a zona de seguridad establecida.
+Reportar si falta alguien o hay personas atrapadas.
+Tabla de Zonas (Sector / Zona / Edificación):
+Calle, portón sur                 -    | Z1 | -    Edificio D, laboratorios de investigación
+Calle, frente a lab. Mecánica - | Z2 | -     E, I, T, E, R, C, A
+Calle, frente a edificio P     -    | Z3 |  -    I, M, P, A, S
+Patio Central                      -     | Z4 |  -   B, C, L
+Calle, portón san José      -       | Z5 | -   A, N, P
+Calle                                  -       | Z6 | -   M, Cafetería
+ [3.1]
+Información a transmitir al equipo:
+Tipo de evento e intensidad percibida.
+Daños reportados por zonas.
+Personas atrapadas o sin contabilizar.
+Necesidades de apoyo para evacuación.
+
+Criterios de escalamiento automático → elevar a Crítica SIEMPRE ante:
+Sismo de intensidad fuerte o mayor.
+Alerta oficial de tsunami o amenaza natural.
+Orden formal de evacuación por autoridad competente.
+Colapso parcial de instalaciones o múltiples daños reportados.
+
+
+
+
+SEG-001 — VIOLENCIA INTERPERSONAL
+ID Subcategoría: 9 — Violencia interpersonal
+Categoría: Seguridad
+Especialidad Respondedor: Guardia / Personal de Seguridad
+Prioridad: Alta — se eleva a Crítica si hay agresión física en curso, armas o personas heridas
+Activación: Se activa cuando se reporta empujones, golpes, amenazas, agresión verbal o física entre dos o más personas, acoso, intimidación o conflicto que se intensifica. Comprende también violencia en relaciones, amenazas de daño físico o cualquier situación donde una persona ataca o amenaza a otra. Si hay armas, agresión física en curso o personas heridas → se activa también SAL-001 de inmediato.
+
+Verificación de seguridad: El sistema debe indicar al reportante que NO intervenga directamente ni se interponga entre las personas si hay violencia física. Alejarse a distancia segura, buscar zona protegida y llamar desde lugar seguro. No intentar mediar solo.
+
+Datos que el sistema debe recabar del reportante:
+¿Hay agresión física en curso o solo amenazas? ¿Se observan golpes, empujones, armas?
+¿Cuántas personas están involucradas? ¿Hay heridas visibles o alguien en riesgo de gravedad?
+¿En qué lugar exacto ocurre? ¿Interior, exterior, piso, sala, vía de circulación?
+¿Existe riesgo de que se extienda a más personas o a zonas aledañas?
+¿Hay testigos que puedan colaborar o requieren también protección?
+¿Se sabe si hay armas, objetos peligrosos o sustancias involucradas?
+
+Acciones que el sistema debe ejecutar:
+Activar notificación inmediata al personal de seguridad con ubicación exacta y naturaleza del conflicto.
+Si hay agresión física en curso, armas o personas heridas: elevar prioridad a Crítica y llamar a Carabineros.
+Transmitir todos los datos al equipo de respuesta: ubicación, cantidad de personas, presencia de armas, personas heridas.
+Orientar al reportante a mantenerse seguro y facilitar acceso al personal de respuesta.
+
+Indicaciones que el sistema debe entregar al reportante:
+Alejarse de inmediato a lugar seguro. NO intervenir ni intentar mediar solo.
+No aproximarse si hay golpes o amenazas con objetos.
+Indicar a otras personas que se alejen y no se acerquen.
+Mantenerse en lugar seguro y facilitar acceso al personal que llega.
+No confrontar ni provocar a las personas involucradas.
+Información que el sistema debe registrar y transmitir al equipo de respuesta:
+Ubicación precisa: edificio, piso, sala o vía exterior.
+Estado del conflicto: verbal, amenaza, agresión física en curso.
+Cantidad de personas involucradas y relación entre ellas si se conoce.
+Presencia de armas, objetos o sustancias peligrosas.
+Personas heridas o en riesgo visible.
+
+Criterios de escalamiento automático:
+Se eleva a prioridad Crítica si se confirma cualquiera de estas condiciones:
+Agresión física en curso con golpes, patadas o uso de fuerza.
+Presencia de armas de fuego, armas blancas u objetos que puedan usarse como tales.
+Personas heridas, sangrado o incapacidad para defenderse.
+Amenaza directa de causar daño grave o inminente.
+Imposibilidad de controlar la situación por personal de seguridad.
+Vidas en peligro por algun factor 
+Mientras llega asistencia: mantener distancia, no intervenir sin respaldo, indicar a personas cercanas que se alejen, y vigilar que no se agrave la situación sin exponerse a riesgo.
+
+SEG-002 — AMENAZAS CRÍTICAS
+ID Subcategoría: 10 — Amenazas críticas
+Categoría: Seguridad
+Especialidad Respondedor: Guardia / Personal de Seguridad
+Prioridad: Alta — se eleva a Crítica si hay amenaza de bomba, arma, explosivo o advertencia de ataque inminente
+
+Activación: Se activa cuando se recibe o se reporta amenaza de hacer estallar un artefacto, amenaza con arma, amenaza de ingresar a instalaciones con intención de daño, o cualquier aviso de ataque dirigido contra personas o instalaciones. Comprende también amenazas escritas, verbales o digitales que mencionen artefactos explosivos, armas o planes de causar daño masivo.
+
+Verificación de seguridad: El sistema debe indicar al reportante que NO investigue por cuenta propia, NO toque objetos desconocidos, NO utilice radios ni celulares en zona sospechosa, y evacúe o se aleje según indicación. No difunda la amenaza públicamente.
+
+Datos que el sistema debe recabar del reportante:
+¿Qué tipo de amenaza se recibió? ¿Bomba, arma, ingreso con violencia?
+¿Cómo se recibió: llamada, mensaje, correo, persona directamente?
+¿Se mencionó lugar, hora o forma específica de ejecución?
+¿Se observa objeto sospechoso, paquete abandonado, persona que actúa de forma extraña?
+¿Hay detalles específicos que se mencionaron: colores, marcas, palabras exactas?
+¿Quién reporta y desde dónde? Datos de contacto para seguimiento.
+
+Acciones que el sistema debe ejecutar:
+Activar notificación inmediata a Jefatura de Seguridad y autoridad del campus.
+Si hay amenaza de artefacto, arma o ataque inminente: elevar a Crítica y llamar a Carabineros y Bomberos.
+Transmitir texto exacto de la amenaza, medio de recepción, lugar y cualquier detalle mencionado.
+Coordinar posible evacuación con personal especializado.
+
+Indicaciones que el sistema debe entregar al reportante:
+NO tocar, mover ni aproximarse a objetos o paquetes sospechosos.
+NO usar radios, celulares ni aparatos electrónicos en zona de amenaza.
+Evacuar ordenadamente si se indica, sin llevar objetos innecesarios.
+No difundir la amenaza públicamente ni generar pánico.
+Anotar texto o detalles exactos tal cual se recibieron.
+Permanecer disponible para ampliar información con autoridades.
+
+Información que el sistema debe registrar y transmitir al equipo de respuesta:
+Texto o contenido exacto de la amenaza tal cual se recibió.
+Medio por el cual se recibió: llamada, mensaje, correo, persona.
+Hora y lugar mencionado.
+Detalles específicos: descripciones, frases, tonos, ruidos.
+Datos del reportante y contacto.
+Presencia de objetos sospechosos o personas observadas.
+
+Criterios de escalamiento automático:
+Se eleva a prioridad Crítica y se llama inmediatamente a Carabineros y Bomberos si se confirma cualquiera de estas condiciones:
+Amenaza de artefacto explosivo o bomba.
+Amenaza con arma de fuego o blanca dentro de instalaciones.
+Aviso de ingreso de personas armadas o con intención de ataque.
+Indicación de que el suceso ocurrirá en minutos u horas inmediatas.
+Se observa objeto sospechoso que coincide con la descripción.
+Mientras llega asistencia especializada: NO realizar búsquedas por cuenta propia, despejar zona, mantener distancia, y esperar instrucciones de autoridades.
+
+SEG-003 — DELITOS O CONDUCTAS ILÍCITAS
+ID Subcategoría: 11 — Delitos / conductas ilícitas
+Categoría: Seguridad
+Especialidad Respondedor: Guardia / Personal de Seguridad
+Prioridad: Media — se eleva a Alta si el delito está en curso, hay sospechoso en zona o se desconocen armas involucradas
+
+Activación: Se activa cuando se reporta robo, hurto, daño a propiedad, ingreso sin autorización, venta o consumo de sustancias prohibidas, o cualquier acción que pueda constituir delito o falta penal dentro de las instalaciones. Comprende también robo de objetos, daño a infraestructura, presencia de personas sin autorización, o conducta que sugiere preparación de ilícito. Si el delito está en curso o hay confrontación → elevar a prioridad Alta.
+
+Verificación de seguridad: El sistema debe indicar al reportante que NO persiga, NO confrontar ni intente detener a personas sospechosas. Observar desde lugar seguro, anotar características y no arriesgar integridad personal.
+
+Datos que el sistema debe recabar del reportante:
+¿Qué hecho se observó o sufrió? ¿Robo, daño, ingreso, venta, consumo?
+¿Ocurre en este momento o ya finalizó? ¿Hace cuánto ocurrió?
+¿Descripción de personas involucradas: ropa, estatura, sexo, rasgos, vehículo?
+¿Se llevaron objetos o se dañó algo? ¿Qué valor aproximado?
+¿Hay testigos que puedan identificar o describir lo ocurrido?
+¿Se sabe si portaban objetos o armas? ¿Hacia dónde se retiraron?
+
+Acciones que el sistema debe ejecutar:
+Notificar a personal de seguridad con descripción del hecho, personas y dirección de huida.
+Si el delito está en curso o personas aún en zona: elevar a Alta.
+Transmitir todos los datos para registro y seguimiento.
+Indicaciones que el sistema debe entregar al reportante:
+NO perseguir ni intentar detener por cuenta propia.
+Observar desde lugar seguro y anotar detalles: ropa, estatura, dirección.
+No tocar zonas dañadas ni alterar evidencias.
+Tomar fotografías o videos desde distancia si es posible SIN exponerse.
+Guardar relación de objetos perdidos o daños.
+Permanecer disponible para declarar o ampliar información.
+Avisar a Patrocinadoras.
+
+Información que el sistema debe registrar y transmitir al equipo de respuesta:
+Tipo de hecho: robo, daño, ingreso, consumo, venta u otro.
+Ubicación exacta y hora aproximada.
+Descripción de personas: ropa, estatura, rasgos, voz, olor.
+Objetos sustraídos o dañados: descripción y valor aproximado.
+Dirección hacia donde se retiraron.
+Testigos disponibles y datos de contacto.
+Criterios de escalamiento automático:
+
+Se eleva a prioridad Alta si se confirma cualquiera de estas condiciones:
+El delito se está cometiendo en este momento.
+Personas involucradas aún se encuentran dentro de instalaciones.
+Se observó que portaban objetos que podrían ser armas.
+Robo con violencia, amenaza o daño a instalaciones críticas.
+Reiteración del mismo hecho en zona o día.
+Si el hecho ya ocurrió y personas se retiraron: se mantiene prioridad Media, se registra informe, y se orienta al afectado sobre denuncia ante autoridades externas.
+
+SEG-004 — ORDEN PÚBLICO / SOSPECHA
+ID Subcategoría: 12 — Orden público / sospecha
+Categoría: Seguridad
+Especialidad Respondedor: Guardia / Personal de Seguridad
+Prioridad: Baja — se eleva a Media si la conducta persiste, se repite o sugiere riesgo
+
+Activación: Se activa cuando se observa persona o conducta que llama la atención sin ser claramente delictiva ni violenta: persona merodeando, intento de acceso sin autorización, comportamiento inusual en horarios o zonas restringidas, paquete o vehículo abandonado sin justificación, reunión que obstruye vías, o cualquier situación que genera duda razonable sin constituir amenaza inmediata. Si la conducta se vuelve amenazante → activar protocolo correspondiente.
+
+Verificación de seguridad: El sistema debe indicar al reportante que NO confrontar, NO acusar directamente, NO impedir el paso. Observar desde lugar visible y seguro, anotar detalles y dejar verificar al personal de seguridad.
+Datos que el sistema debe recabar del reportante:
+¿Qué conducta o situación llama la atención?
+¿Descripción de personas, vehículos u objetos observados?
+¿En qué lugar exacto y desde cuándo permanecen?
+¿Se observa comportamiento que sugiere ocultar algo, vigilar, esperar?
+¿Han intentado acceder a zonas restringidas o interactúan con personas?
+¿Se han retirado o permanecen en el lugar al momento del reporte?
+
+Acciones que el sistema debe ejecutar:
+Notificar a personal de seguridad con ubicación, descripción y conducta observada.
+Solicitar verificación presencial sin confrontación.
+Si la situación persiste, se repite o sugiere riesgo: elevar a Media y ampliar vigilancia.
+Registrar hallazgo para seguimiento y patrones de comportamiento.
+Indicaciones que el sistema debe entregar al reportante:
+Mantener distancia y seguridad. NO confrontar ni acusar.
+Anotar detalles: ropa, estatura, vehículo, placa si aplica.
+No aproximarse ni interrumpir la actividad.
+Seguir su trayecto y avisar si se acerca a zonas protegidas.
+Reportar si la conducta cambia, se vuelve amenazante o se retira.
+
+Información que el sistema debe registrar y transmitir al equipo de respuesta:
+Ubicación, hora y duración de la observación.
+Descripción de personas, ropa, objetos o vehículos.
+Conducta observada: merodeo, observación, intento de acceso, espera.
+Interacción con personas o instalaciones.
+Si persiste o se ha retirado.
+
+Criterios de escalamiento automático:
+Se eleva a prioridad Media si se confirma cualquiera de estas condiciones:
+La persona o grupo regresa en repetidas ocasiones.
+Intento de acceso a zonas restringidas sin autorización.
+Conducta que sugiere observar, vigilar o registrar instalaciones.
+Objeto o vehículo permanece más de 2 horas sin justificación.
+La situación genera alarma entre varias personas de forma simultánea.
+Si tras verificación no se confirma riesgo: se registra el hallazgo, se mantiene vigilancia discreta y se da por cerrado el reporte sin escalamiento.
+
+
+
+
