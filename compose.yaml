@@ -1,0 +1,23 @@
+services:
+  chatbot:
+    build: .
+    container_name: orion-chatbot
+    env_file: .env          # el MISMO .env (INTERNAL_TOKEN) que usa el backend
+    expose:
+      - "8000"              # solo visible dentro de orion-network; NO usar "ports"
+    networks:
+      - orion-network
+    restart: unless-stopped
+
+  # El backend debe estar en la misma red y llamar a http://chatbot:8000/v1/chat
+  # backend:
+  #   ...
+  #   env_file: .env
+  #   environment:
+  #     CHATBOT_URL: http://chatbot:8000
+  #   networks:
+  #     - orion-network
+
+networks:
+  orion-network:
+    name: orion-network

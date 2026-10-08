@@ -1,0 +1,21 @@
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Sid": "BedrockInvoke",
+      "Effect": "Allow",
+      "Action": ["bedrock:InvokeModel"],
+      "Resource": [
+        "arn:aws:bedrock:*::foundation-model/amazon.titan-embed-text-v2:0",
+        "arn:aws:bedrock:*::foundation-model/amazon.nova-lite-v1:0",
+        "arn:aws:bedrock:*:*:inference-profile/us.amazon.nova-lite-v1:0"
+      ]
+    },
+    {
+      "Sid": "LeerProtocolosS3",
+      "Effect": "Allow",
+      "Action": ["s3:GetObject"],
+      "Resource": "arn:aws:s3:::NOMBRE-DEL-BUCKET/*"
+    }
+  ]
+}
