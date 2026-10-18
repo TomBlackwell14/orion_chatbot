@@ -19,8 +19,8 @@ if __name__ == "__main__":
         if pregunta.lower() in ["salir", "exit", "q"]:
             print("👋 Hasta luego")
             break
-        historial.append({"emisor": "USUARIO", "contenido": pregunta})
+        historial.append({"rol": "usuario", "texto": pregunta})
         r = responder(historial, contexto)
-        historial.append({"emisor": "BOT", "contenido": r["respuesta_texto"]})
+        historial.append({"rol": "bot", "texto": r["respuesta_texto"]})
         print(f"ORION: {r['respuesta_texto']}")
         print(f"   {json.dumps({k: v for k, v in r.items() if k != 'respuesta_texto'}, ensure_ascii=False)}\n")

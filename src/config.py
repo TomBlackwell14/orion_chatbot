@@ -3,10 +3,10 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-# Seguridad interna (backend -> chatbot). Debe ser el MISMO valor en ambos contenedores.
+# Seguridad interna (backend -> chatbot). Debe ser el MISMO valor que CHATBOT_INTERNAL_TOKEN en NestJS.
 INTERNAL_TOKEN = os.getenv("INTERNAL_TOKEN", "")
 
-# Modo de respuesta: "rag" (Bedrock + pgvector) o "eco" (solo devuelve el último mensaje, para probar el contrato)
+# Modo de respuesta: "rag" (Bedrock + índice local) o "eco" (solo devuelve el mensaje, para probar el contrato)
 CHATBOT_MODO = os.getenv("CHATBOT_MODO", "rag").lower()
 
 # AWS Bedrock (en la EC2 las credenciales vienen del rol IAM; no poner access keys)
@@ -16,21 +16,17 @@ EMBEDDING_MODEL = os.getenv("EMBEDDING_MODEL", "amazon.titan-embed-text-v2:0")
 LLM_MODEL = os.getenv("LLM_MODEL", "us.amazon.nova-lite-v1:0")
 EMBEDDING_DIM = 1024
 
-# Fuente de protocolos para index.py: ruta local o s3://bucket/clave.txt
-PROTOCOLOS_S3_URI = os.getenv("PROTOCOLOS_S3_URI", "")
-
-# Base de Datos PostgreSQL — Datos reales de ORION
-DB_CONFIG = {
-    "host": os.getenv("DB_HOST", "3.18.117.177"),
-    "port": os.getenv("DB_PORT", "5432"),
-    "dbname": os.getenv("DB_NAME", "orion_db"),
-    "user": os.getenv("DB_USER", "orion_user"),
-    "password": os.getenv("DB_PASSWORD", ""),
-    "connect_timeout": 5,
-}
+# Protocolos: archivo dentro de la imagen (docs/). El índice se arma en memoria al primer uso.
+PROTOCOLOS_PATH = os.getenv("PROTOCOLOS_PATH", "")
 
 # Parámetros de recuperación / generación
 TOP_K_RESULTS = int(os.getenv("TOP_K_RESULTS", "3"))
 MAX_HISTORIAL = int(os.getenv("MAX_HISTORIAL", "20"))  # últimos N mensajes que se envían al LLM
 MAX_TOKENS = int(os.getenv("MAX_TOKENS", "800"))
 TEMPERATURE = float(os.getenv("TEMPERATURE", "0.1"))
+
+# Contactos de la sede que el bot puede entregar (validar con la institución antes de producción)
+CONTACTOS_SEDE = os.getenv(
+    "CONTACTOS_SEDE",
+    "Seguridad: +56 32 227 7999 (anexo 999) · Salud (policlínico sede): +56 32 227 7888",
+)

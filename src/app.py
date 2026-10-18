@@ -1,19 +1,19 @@
-"""API interna del chatbot ORION (contrato Backend -> Chatbot).
+"""API interna del chatbot ORION (contrato Backend -> Chatbot, ver ORION API 1.0 — Chatbot del 17-10-2026).
 
-GET  /health    -> estado del servicio (sin token)
-POST /v1/chat   -> recibe contexto del incidente + historial y devuelve la respuesta (requiere X-Internal-Token)
+GET  /health      -> estado del servicio (sin token)
+POST /v1/chat     -> mensaje + historial + contexto del incidente; responde orientación y riesgo_vital
+POST /v1/resumen  -> historial completo; responde resumen_ia y datos_clave para el Respondedor asignado
 
-El chatbot NO guarda estado: el backend envía el historial en cada llamada.
-Si algo falla responde 503 y el backend entrega su mensaje de fallback (131/132/133, es_fallback = true).
+Los dos POST requieren X-Internal-Token. El chatbot NO guarda estado ni usa la BD: el backend envía todo en cada
+llamada. Si algo falla responde 503 y NestJS aplica su fallback (chat) o conserva el análisis previo (resumen).
 """
 import hmac
 import logging
 import time
-import uuid
-from typing import Optional
+from typing import Literal, Optional
 
 from fastapi import Depends, FastAPI, Header, HTTPException
-from pydantic import AliasChoices, BaseModel, Field
+from pydantic import BaseModel, Field
 
 from config import CHATBOT_MODO, INTERNAL_TOKEN, LLM_MODEL
 
@@ -23,36 +23,85 @@ log = logging.getLogger("orion-chatbot")
 if not INTERNAL_TOKEN:
     raise RuntimeError("Falta la variable de entorno INTERNAL_TOKEN")
 
-app = FastAPI(title="ORION Chatbot", version="1.0.0")
+app = FastAPI(title="ORION Chatbot", version="2.0.0")
 
 
-# ---------- Contrato ----------
+# ---------- Contrato: lo que manda NestJS ----------
 
-class Mensaje(BaseModel):
-    emisor: str = Field(..., validation_alias=AliasChoices("emisor", "rol"))  # USUARIO | BOT
-    contenido: str = Field(..., max_length=4000)
+class Turno(BaseModel):
+    rol: Literal["usuario", "bot"]
+    texto: str = Field(..., max_length=4000)
 
 
-class Contexto(BaseModel):
-    categoria: Optional[str] = None         # Salud | Infraestructura | Seguridad
-    subcategoria: Optional[str] = None      # ej. "Violencia interpersonal"
-    ubicacion: Optional[str] = None         # ej. "Edificio A"
-    estado_incidente: Optional[str] = None  # Recibido | En camino
+class Ubicacion(BaseModel):
+    id_ubicacion: Optional[int] = None
+    nombre: Optional[str] = None
+    latitud: Optional[float] = None
+    longitud: Optional[float] = None
+
+
+class CategoriaRef(BaseModel):
+    id_categoria: Optional[int] = None
+    nombre: str
+
+
+class SubcategoriaRef(BaseModel):
+    id_subcategoria: Optional[int] = None
+    nombre: str
+
+
+class ContextoChat(BaseModel):
+    rol_usuario: Optional[str] = None
+    estado_incidente: Optional[str] = None  # Recibido | En_camino
+    categoria: Optional[CategoriaRef] = None
+    subcategoria: Optional[SubcategoriaRef] = None
+    ubicacion_incidente: Optional[Ubicacion] = None
+    ubicacion_actual: Optional[Ubicacion] = None
 
 
 class ChatRequest(BaseModel):
-    conversacion_id: Optional[int | str] = None
-    contexto: Contexto = Field(default_factory=Contexto)
-    historial: list[Mensaje] = Field(default_factory=list, description="Mensajes USUARIO y BOT en orden cronológico")
-    mensaje: Optional[str] = Field(None, max_length=4000, description="Mensaje actual del usuario, si no viene ya al final del historial")
+    request_id: str
+    id_incidente: int
+    id_conversacion: int
+    mensaje: str = Field(..., min_length=1, max_length=4000)
+    historial: list[Turno] = Field(default_factory=list)  # hasta 10 anteriores, sin el mensaje actual
+    contexto: ContextoChat
 
+
+class ContextoResumen(BaseModel):
+    estado_incidente: Optional[str] = None
+    subcategoria: Optional[SubcategoriaRef] = None
+    ubicacion_incidente: Optional[Ubicacion] = None
+
+
+class ResumenRequest(BaseModel):
+    request_id: str
+    id_incidente: int
+    id_conversacion: int
+    contexto: ContextoResumen = Field(default_factory=ContextoResumen)
+    historial: list[Turno]  # conversación completa USUARIO/BOT
+
+
+# ---------- Contrato: lo que responde el chatbot ----------
 
 class ChatResponse(BaseModel):
+    request_id: str
     respuesta_texto: str
-    accion_sugerida: str   # NINGUNA | PEDIR_MAS_INFO | EVACUAR | LLAMAR_EMERGENCIAS | PRIMEROS_AUXILIOS | ESPERAR_RESPONDEDOR
     riesgo_vital: bool
-    derivar_a_humano: bool
-    metadata: dict = {}    # modelo, latencia_ms, protocolos, datos_clave, request_id (auditoría, la app no lo ve)
+    modelo: Optional[str] = None
+    protocolo: Optional[str] = None
+    latencia_ms: int = 0
+
+
+class DatosClave(BaseModel):
+    puntos_criticos: list[str] = Field(default_factory=list)
+    orientaciones_entregadas: list[str] = Field(default_factory=list)
+
+
+class ResumenResponse(BaseModel):
+    request_id: str
+    resumen_ia: str
+    datos_clave: DatosClave
 
 
 # ---------- Seguridad ----------
@@ -62,45 +111,109 @@ def verificar_token(x_internal_token: str = Header(default="")):
         raise HTTPException(status_code=401, detail="Token interno inválido")
 
 
+# ---------- Adaptador hacia rag.py ----------
+
+def _nombre_ubicacion(u: Optional[Ubicacion]) -> Optional[str]:
+    if u is None:
+        return None
+    if u.nombre:
+        return u.nombre
+    if u.latitud is not None and u.longitud is not None:
+        return f"{u.latitud}, {u.longitud}"
+    return None
+
+
+def contexto_para_rag(estado: Optional[str], categoria: Optional[CategoriaRef],
+                      subcategoria: Optional[SubcategoriaRef], ubicacion: Optional[Ubicacion],
+                      actual: Optional[Ubicacion] = None) -> dict:
+    """rag.py trabaja con textos simples; aquí se traducen los objetos del contrato."""
+    texto_ubicacion = _nombre_ubicacion(ubicacion)
+    texto_actual = _nombre_ubicacion(actual)
+    if texto_actual:
+        texto_ubicacion = f"{texto_ubicacion or 'sin dato'} (el usuario ahora está en: {texto_actual})"
+    return {
+        "categoria": categoria.nombre if categoria else None,
+        "subcategoria": subcategoria.nombre if subcategoria else None,
+        "ubicacion": texto_ubicacion,
+        "estado_incidente": estado,  # se deja "En_camino" tal cual: el prompt lo reconoce
+    }
+
+
 # ---------- Endpoints ----------
 
 @app.get("/health")
 def health():
     estado = {"status": "ok", "modo": CHATBOT_MODO}
     if CHATBOT_MODO == "rag":
-        from rag import ping_db
+        from rag import protocolos_cargados
         estado["modelo"] = LLM_MODEL
-        estado["db"] = "ok" if ping_db() else "error"
+        try:
+            estado["protocolos"] = protocolos_cargados()
+        except OSError:
+            estado["protocolos"] = 0
     return estado
 
 
 @app.post("/v1/chat", response_model=ChatResponse, dependencies=[Depends(verificar_token)])
-def chat(req: ChatRequest, x_request_id: str = Header(default="")):
-    request_id = x_request_id or str(uuid.uuid4())
+def chat(req: ChatRequest):
     inicio = time.monotonic()
-
-    historial = [m.model_dump() for m in req.historial]
-    if req.mensaje and req.mensaje.strip():
-        historial.append({"emisor": "USUARIO", "contenido": req.mensaje})
-    if not any(m["emisor"].upper() == "USUARIO" for m in historial):
-        raise HTTPException(status_code=422, detail="No hay mensaje del usuario")
-
-    log.info("request_id=%s conversacion_id=%s mensajes=%d", request_id, req.conversacion_id, len(historial))
+    ctx = req.contexto
+    log.info("request_id=%s endpoint=chat incidente=%s conversacion=%s historial=%d", req.request_id,
+             req.id_incidente, req.id_conversacion, len(req.historial))
 
     if CHATBOT_MODO == "eco":
-        ultimo = next(m["contenido"] for m in reversed(historial) if m["emisor"].upper() == "USUARIO")
-        resultado = {"respuesta_texto": f"Eco: {ultimo}", "accion_sugerida": "PEDIR_MAS_INFO",
-                     "riesgo_vital": False, "derivar_a_humano": False, "metadata": {"modelo": "eco"}}
+        respuesta = ChatResponse(request_id=req.request_id, respuesta_texto=f"[eco] Recibí: {req.mensaje}",
+                                 riesgo_vital=False, modelo="eco")
     else:
         from rag import responder
+        historial = [t.model_dump() for t in req.historial] + [{"rol": "usuario", "texto": req.mensaje}]
         try:
-            resultado = responder(historial, req.contexto.model_dump())
-        except Exception:
-            log.exception("request_id=%s error generando respuesta", request_id)
+            r = responder(historial, contexto_para_rag(ctx.estado_incidente, ctx.categoria, ctx.subcategoria,
+                                                       ctx.ubicacion_incidente, ctx.ubicacion_actual))
+        except Exception as e:
+            log.error("request_id=%s endpoint=chat error=%s", req.request_id, type(e).__name__)
             raise HTTPException(status_code=503, detail="Chatbot no disponible")
+        respuesta = ChatResponse(request_id=req.request_id, respuesta_texto=r["respuesta_texto"],
+                                 riesgo_vital=r["riesgo_vital"], modelo=LLM_MODEL, protocolo=r["protocolo"])
+        meta = r["metadata"]
+        log.info("request_id=%s protocolos_recuperados=%s senales_regla=%s riesgo_vital_modelo=%s respuesta_segura=%s",
+                 req.request_id, meta["protocolos_recuperados"], meta["senales_regla"], meta["riesgo_vital_modelo"],
+                 meta.get("respuesta_segura", False))
+        if meta.get("respuesta_segura"):
+            respuesta.modelo = "respuesta_segura"
 
-    resultado["metadata"]["request_id"] = request_id
-    resultado["metadata"]["latencia_ms"] = int((time.monotonic() - inicio) * 1000)
-    log.info("request_id=%s accion=%s riesgo_vital=%s latencia_ms=%s", request_id,
-             resultado["accion_sugerida"], resultado["riesgo_vital"], resultado["metadata"]["latencia_ms"])
-    return ChatResponse(**resultado)
+    respuesta.latencia_ms = int((time.monotonic() - inicio) * 1000)
+    log.info("request_id=%s endpoint=chat riesgo_vital=%s protocolo=%s latencia_ms=%s", req.request_id,
+             respuesta.riesgo_vital, respuesta.protocolo, respuesta.latencia_ms)
+    return respuesta
+
+
+@app.post("/v1/resumen", response_model=ResumenResponse, dependencies=[Depends(verificar_token)])
+def resumen(req: ResumenRequest):
+    inicio = time.monotonic()
+    ctx = req.contexto
+    log.info("request_id=%s endpoint=resumen incidente=%s conversacion=%s historial=%d", req.request_id,
+             req.id_incidente, req.id_conversacion, len(req.historial))
+
+    if not any(t.rol == "usuario" and t.texto.strip() for t in req.historial):
+        raise HTTPException(status_code=422, detail="El historial no tiene mensajes del usuario")
+
+    if CHATBOT_MODO == "eco":
+        respuesta = ResumenResponse(request_id=req.request_id,
+                                    resumen_ia=f"[eco] Conversación con {len(req.historial)} mensajes.",
+                                    datos_clave=DatosClave())
+    else:
+        from rag import resumir
+        try:
+            r = resumir([t.model_dump() for t in req.historial],
+                        contexto_para_rag(ctx.estado_incidente, None, ctx.subcategoria, ctx.ubicacion_incidente))
+        except Exception as e:
+            log.error("request_id=%s endpoint=resumen error=%s", req.request_id, type(e).__name__)
+            raise HTTPException(status_code=503, detail="Resumen no disponible")
+        respuesta = ResumenResponse(request_id=req.request_id, resumen_ia=r["resumen_ia"],
+                                    datos_clave=DatosClave(**r["datos_clave"]))
+
+    log.info("request_id=%s endpoint=resumen puntos=%d orientaciones=%d latencia_ms=%d", req.request_id,
+             len(respuesta.datos_clave.puntos_criticos), len(respuesta.datos_clave.orientaciones_entregadas),
+             int((time.monotonic() - inicio) * 1000))
+    return respuesta
