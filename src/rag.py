@@ -22,19 +22,21 @@ from config import (
     MAX_HISTORIAL, MAX_TOKENS, PROTOCOLOS_PATH, TEMPERATURE, TOP_K_RESULTS,
 )
 
-# El backend espera como máximo 25 s; dejamos margen
+# El backend espera como máximo 25 s y /v1/chat hace 2 llamadas (embedding + converse): sin reintentos,
+# cada una toma a lo más 2 + 10 s, así el peor caso (24 s) queda dentro del límite.
 bedrock = boto3.client(
     "bedrock-runtime",
     region_name=AWS_REGION,
-    config=Config(connect_timeout=3, read_timeout=18, retries={"max_attempts": 1}),
+    config=Config(connect_timeout=2, read_timeout=10, retries={"total_max_attempts": 1}),
 )
 
 AVISO = "ORION es una guía de apoyo. No sustituye a personal de salud ni a servicios de emergencia."
 
 REGLAS_ORION = f"""REGLAS QUE NUNCA SE ROMPEN:
 - Tú solo orientas con texto. No ejecutas acciones en el sistema.
-- No digas que alguien fue notificado, que el personal va en camino ni que llegará en cierto tiempo, salvo que el
-  estado del incidente sea "En_camino" (entonces puedes decir que un respondedor ya va en camino, sin dar tiempos).
+- No digas que alguien fue notificado ni des tiempos de llegada.
+- No digas que el personal va en camino, salvo que el estado del incidente sea "En_camino" (entonces puedes decir
+  que un respondedor ya va en camino, sin dar tiempos).
 - No llames ni digas que llamarás a nadie. No menciones números de emergencia externos (131, 132, 133 u otros).
   Si corresponde dar un contacto, usa solo estos de la sede: {CONTACTOS_SEDE}.
 - No cambies ni sugieras cambiar la categoría, la subcategoría, la prioridad ni el respondedor.
