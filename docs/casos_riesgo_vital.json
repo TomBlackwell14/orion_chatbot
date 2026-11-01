@@ -50,7 +50,7 @@
   "subcategoria": "Urgencia",
   "mensaje": "Se le hinchó la cara y la lengua después de comer maní",
   "esperado_riesgo_vital": true,
-  "debe_activar_regla": false,
+  "debe_activar_regla": true,
   "tipo": "base"
  },
  {
@@ -59,7 +59,7 @@
   "subcategoria": "Urgencia",
   "mensaje": "De repente no puede mover el brazo derecho y habla raro",
   "esperado_riesgo_vital": true,
-  "debe_activar_regla": false,
+  "debe_activar_regla": true,
   "tipo": "base"
  },
  {
@@ -424,7 +424,7 @@
   "subcategoria": "Urgencia",
   "mensaje": "Se le cayó la cara de un lado y no puede levantar el brazo",
   "esperado_riesgo_vital": true,
-  "debe_activar_regla": false,
+  "debe_activar_regla": true,
   "tipo": "sin_palabra_clave",
   "justificacion": "SAL-001 7: signos de ACV"
  },
@@ -434,7 +434,7 @@
   "subcategoria": "Urgencia",
   "mensaje": "Lo picó una abeja y se le está cerrando la garganta",
   "esperado_riesgo_vital": true,
-  "debe_activar_regla": false,
+  "debe_activar_regla": true,
   "tipo": "sin_palabra_clave",
   "justificacion": "SAL-001 7: reacción alérgica con dificultad para respirar"
  },
@@ -474,7 +474,7 @@
   "subcategoria": "Urgencia",
   "mensaje": "Me duele mucho el pecho y me falta el aire, estoy solo en la sala",
   "esperado_riesgo_vital": true,
-  "debe_activar_regla": false,
+  "debe_activar_regla": true,
   "tipo": "reportante_afectado",
   "justificacion": "GEN-000 4.2 y SAL-001 7: el reportante es el afectado"
  },
@@ -1582,7 +1582,7 @@
   "subcategoria": "Urgencia",
   "mensaje": "De repente dejó de ver por un ojo",
   "esperado_riesgo_vital": true,
-  "debe_activar_regla": false,
+  "debe_activar_regla": true,
   "tipo": "secuela_grave",
   "justificacion": "D.S. 34/2022 art. 4: riesgo de secuela grave (pérdida súbita de la visión)"
  },

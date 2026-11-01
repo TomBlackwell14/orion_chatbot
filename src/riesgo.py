@@ -32,6 +32,20 @@ REGLAS: dict[str, str] = {
     "atrapado_peligro": r"\batrapad\w* (?:en|por|bajo|entre) (?:el |la |los |las )?"
                         r"(?:fuego|humo|llamas|incendio|escombros|derrumbe)\b",
     "electrocucion": r"\b(?:electrocut\w*|recibio una descarga|le dio la corriente|pegada a la corriente)\b",
+    # D.S. 34/2022: obstrucción de la vía aérea por reacción alérgica grave
+    # (la garganta sola no: "garganta inflamada" suele ser un resfrío)
+    "via_aerea_alergia": r"\b(?:hinch\w*|inflam\w*)(?: \w+){0,4} (?:lengua|glotis)\b|"
+                         r"\blengua (?:hinchad\w*|inflamad\w*)\b|\bse (?:le|me) (?:esta )?cerrando la garganta\b|"
+                         r"\bse (?:le|me) cierra la garganta\b",
+    # Signos de ACV de inicio súbito: alteración del habla o cara desviada
+    "acv": r"\b(?:habla|hablando) (?:raro|rara|enredad\w*|arrastrad\w*|traposo|incoherente)\b|"
+           r"\b(?:cara|boca) (?:chueca|torcida|caida|desviada)\b|\bse le (?:torcio|cayo|chueco) la (?:cara|boca)\b",
+    # Dolor torácico con dificultad respiratoria (posible infarto o embolía)
+    "dolor_pecho_disnea": r"\b(?:dolor|duele|apret\w*|opresion)(?: \w+){0,4} pecho\b(?: \w+){0,6} "
+                          r"(?:falta (?:el |de )?aire|ahog\w*|dificultad para respirar|no (?:puede|puedo) respirar bien)\b",
+    # Pérdida súbita de la visión (secuela grave)
+    "perdida_vision": r"\b(?:dejo de ver|deje de ver|perdio la vista|perdi la vista|se quedo ciego|me quede ciego|"
+                      r"quedo ciega|no ve nada de (?:un|ningun) ojo)\b",
 }
 
 _COMPILADAS = {nombre: re.compile(patron) for nombre, patron in REGLAS.items()}
