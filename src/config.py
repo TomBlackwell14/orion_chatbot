@@ -24,6 +24,9 @@ TOP_K_RESULTS = int(os.getenv("TOP_K_RESULTS", "3"))
 MAX_HISTORIAL = int(os.getenv("MAX_HISTORIAL", "20"))  # últimos N mensajes que se envían al LLM
 MAX_TOKENS = int(os.getenv("MAX_TOKENS", "800"))
 TEMPERATURE = float(os.getenv("TEMPERATURE", "0.1"))
+# Detector dedicado de riesgo vital: una segunda llamada corta, en paralelo, que solo clasifica. Se combina con OR
+# con el modelo principal y las reglas. DETECTOR_RIESGO=0 lo apaga (sirve para comparar en la evaluación).
+DETECTOR_RIESGO = os.getenv("DETECTOR_RIESGO", "1") not in ("0", "false", "no")
 
 # Contactos de la sede que el bot puede entregar (validar con la institución antes de producción)
 CONTACTOS_SEDE = os.getenv(

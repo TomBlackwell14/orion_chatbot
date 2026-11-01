@@ -78,6 +78,11 @@ class BedrockFalso:
         return {"output": {"message": {"content": [{"text": self.salida_llm}]}}, "usage": {"inputTokens": 1}}
 
 
+def _principal(falso) -> str:
+    """System prompt de la llamada principal (el detector de riesgo hace otra llamada en paralelo)."""
+    return next(s for s in falso.systems if s.startswith("Eres ORION"))
+
+
 @pytest.fixture
 def cliente(monkeypatch):
     def _crear(salida_llm: str):
@@ -111,8 +116,8 @@ def test_chat_contrato_nestjs(cliente):
     assert body["riesgo_vital"] is False
     assert body["protocolo"] == "SEG-001"
     assert set(body) == {"request_id", "respuesta_texto", "riesgo_vital", "modelo", "protocolo", "latencia_ms"}
-    assert "131 SAMU" not in falso.systems[0]
-    assert "ya fue notificado" not in falso.systems[0]
+    assert "131 SAMU" not in _principal(falso)
+    assert "ya fue notificado" not in _principal(falso)
 
 
 def test_chat_riesgo_vital_true(cliente):
@@ -130,12 +135,12 @@ def test_chat_en_camino_y_ubicacion_sin_coordenadas(cliente):
     payload["contexto"]["ubicacion_actual"] = {"id_ubicacion": None, "nombre": None, "latitud": -33.0, "longitud": -71.4}
     r = c.post("/v1/chat", json=payload, headers=HEADERS)
     assert r.status_code == 200
-    assert "En_camino" in falso.systems[0]
-    assert "el usuario ahora está en: -33.0, -71.4" in falso.systems[0]
+    assert "En_camino" in _principal(falso)
+    assert "el usuario ahora está en: -33.0, -71.4" in _principal(falso)
 
 
 def test_chat_json_invalido_503(cliente):
-    c, _ = cliente("Lo siento, no puedo responder en JSON")
+    c, _ = cliente("{Lo siento, no puedo responder en JSON")
     assert c.post("/v1/chat", json=CHAT, headers=HEADERS).status_code == 503
 
 
@@ -200,8 +205,8 @@ def test_regla_riesgo_vital(caso):
 def test_marco_general_siempre_en_el_prompt(cliente):
     c, falso = cliente('{"respuesta_texto": "Aléjate.", "riesgo_vital": false}')
     c.post("/v1/chat", json=CHAT, headers=HEADERS)
-    assert "CRITERIO GENERAL DE RIESGO VITAL" in falso.systems[0]
-    assert falso.systems[0].count("GEN-000 — MARCO GENERAL") == 1  # no se duplica por la búsqueda
+    assert "CRITERIO GENERAL DE RIESGO VITAL" in _principal(falso)
+    assert _principal(falso).count("GEN-000 — MARCO GENERAL") == 1  # no se duplica por la búsqueda
 
 
 def test_regla_sube_riesgo_si_el_modelo_no_lo_marca(cliente):
@@ -209,7 +214,7 @@ def test_regla_sube_riesgo_si_el_modelo_no_lo_marca(cliente):
     payload = {**CHAT, "mensaje": "Uno de los que pelean sacó un arma"}
     body = c.post("/v1/chat", json=payload, headers=HEADERS).json()
     assert body["riesgo_vital"] is True
-    assert "ALERTA DEL SISTEMA" in falso.systems[0]
+    assert "ALERTA DEL SISTEMA" in _principal(falso)
 
 
 def test_regla_no_baja_lo_que_marca_el_modelo(cliente):
@@ -219,7 +224,7 @@ def test_regla_no_baja_lo_que_marca_el_modelo(cliente):
 
 
 def test_bedrock_cae_con_senal_explicita_responde_seguro(cliente):
-    c, _ = cliente("no es json")
+    c, _ = cliente("{no es json")
     payload = {**CHAT, "mensaje": "No respira"}
     r = c.post("/v1/chat", json=payload, headers=HEADERS)
     assert r.status_code == 200

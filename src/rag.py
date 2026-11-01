@@ -12,6 +12,7 @@ import json
 import logging
 import re
 import threading
+from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 
 import boto3
@@ -19,7 +20,7 @@ from botocore.config import Config
 
 from riesgo import detectar_senales
 from config import (
-    AWS_REGION, CONTACTOS_SEDE, EMBEDDING_DIM, EMBEDDING_MODEL, LLM_MODEL,
+    AWS_REGION, CONTACTOS_SEDE, DETECTOR_RIESGO, EMBEDDING_DIM, EMBEDDING_MODEL, LLM_MODEL,
     MAX_HISTORIAL, MAX_TOKENS, PROTOCOLOS_PATH, TEMPERATURE, TOP_K_RESULTS,
 )
 
@@ -62,17 +63,31 @@ CÓMO RESPONDER:
 5. Decide riesgo_vital con el "CRITERIO GENERAL DE RIESGO VITAL" del MARCO GENERAL. Las señales de cada protocolo
    son ejemplos, no una lista cerrada: cualquier riesgo de muerte o de secuela grave (D.S. 34/2022) cuenta, aunque no
    aparezca en ninguna lista. Una pelea, un sismo, una fractura cerrada o un delito, por sí solos, no son riesgo vital.
-   Si lo que ya se describió basta por sí solo (por ejemplo, signos de vía aérea comprometida, de ACV o de infarto,
-   una pérdida súbita de una función del cuerpo, o alguien que no puede ponerse a salvo por sí mismo ante un peligro),
-   marca riesgo_vital = true de inmediato, también si el afectado es quien escribe: no esperes confirmar otra señal.
-   Solo si la señal grave es posible pero aún no está descrita, deja riesgo_vital = false y pregunta por ella.
-   Si el usuario confirma una señal por la que preguntaste (por ejemplo, responde que el sangrado sigue pese a la
-   presión, que no respira o que hay un arma), esa señal queda descrita: riesgo_vital = true.
+   Si una señal es probable pero no está descrita, deja riesgo_vital = false y pregunta por ella en este mismo mensaje.
+   Si el usuario confirma una señal por la que preguntaste, o si quien escribe es el afectado y describe una señal,
+   esa señal ya está descrita: riesgo_vital = true.
 6. Si el mensaje no tiene relación con la emergencia, redirige amablemente al tema.
 
 FORMATO DE SALIDA: responde SOLO con un objeto JSON válido, sin texto adicional ni bloques de código:
 {{"respuesta_texto": "texto para la persona", "riesgo_vital": false, "protocolo": "SAL-001"}}
 "protocolo" es el código del protocolo que más usaste, o null."""
+
+SYSTEM_PROMPT_RIESGO = """Eres el detector de riesgo vital de ORION, un sistema de emergencias de una sede universitaria.
+NO respondes al usuario: solo clasificas la conversación según el CRITERIO entregado.
+
+Cómo decidir:
+- Marca riesgo_vital = true si en la conversación hay AL MENOS UNA señal concreta de riesgo de muerte o de secuela
+  grave (o una amenaza del entorno que pueda causarlo) que no haya sido descartada después.
+- Basta con que se describa con duda ("creo que", "parece que"). También cuenta si el afectado es quien escribe.
+- Las señales pueden estar repartidas en varios mensajes: una respuesta corta del usuario ("sí", "no", "sigue igual")
+  confirma o niega lo que el asistente le preguntó justo antes.
+- NO es riesgo vital: solo el tipo de incidente sin una señal concreta ("hay una pelea", "tembló", "se cayó"), una
+  señal que el usuario descartó ("respira normal", "no hay armas") o que ya pasó y la persona está bien.
+- Ante una duda real entre true y false, elige true: un caso grave no detectado es mucho peor que una falsa alarma.
+
+Responde SOLO con un objeto JSON válido, sin texto adicional:
+{"riesgo_vital": true, "senal": "cita breve de la señal, o null si no hay"}"""
+
 
 SYSTEM_PROMPT_RESUMEN = f"""Eres el módulo de resumen de ORION. Recibes la conversación entre la persona que reportó un
 incidente (usuario) y el asistente (bot). El resumen lo leerá el Respondedor asignado antes de atender.
@@ -193,6 +208,20 @@ def normalizar_historial(historial: list[dict]) -> list[dict]:
     return mensajes
 
 
+def _historial_plano(mensajes: list[dict]) -> list[dict]:
+    """Deshace el JSON con que se reenvían los turnos del bot (para el detector)."""
+    salida = []
+    for m in mensajes:
+        texto = m["content"][0]["text"]
+        if m["role"] == "assistant":
+            try:
+                texto = json.loads(texto).get("respuesta_texto", texto)
+            except (json.JSONDecodeError, AttributeError):
+                pass
+        salida.append({"role": m["role"], "content": [{"text": texto}]})
+    return salida
+
+
 def consulta_para_busqueda(mensajes: list[dict], contexto: dict) -> str:
     """Subcategoría/categoría del incidente + últimos mensajes del usuario."""
     del_usuario = [m["content"][0]["text"] for m in mensajes if m["role"] == "user"]
@@ -291,6 +320,33 @@ def responder(historial: list[dict], contexto: dict | None = None) -> dict:
         }
 
 
+def _criterio_riesgo() -> str:
+    """Solo la sección 3 de GEN-000 (criterio de riesgo vital): prompt corto y barato para el detector."""
+    marco = marco_general()
+    m = re.search(r"^3\.1 .*?(?=^4\.|\Z)", marco, flags=re.MULTILINE | re.DOTALL)
+    return m.group(0).strip() if m else marco
+
+
+def detectar_riesgo_modelo(mensajes: list[dict]) -> bool | None:
+    """Segunda opinión del modelo, solo sobre riesgo vital. Devuelve None si falla (no bloquea la respuesta).
+    La conversación va como transcripción en un solo mensaje, así el formato del historial no influye."""
+    lineas = [f"{'USUARIO' if m['role'] == 'user' else 'ASISTENTE'}: {m['content'][0]['text']}" for m in mensajes]
+    pedido = f"CRITERIO (GEN-000, sección 3):\n{_criterio_riesgo()}\n\nCONVERSACIÓN:\n" + "\n".join(lineas)
+    try:
+        salida, _ = _converse(SYSTEM_PROMPT_RIESGO, [{"role": "user", "content": [{"text": pedido}]}])
+    except Exception as e:  # noqa: BLE001
+        log.warning("detector de riesgo falló: %s", e)
+        return None
+    datos = _parsear_json(salida)
+    if datos and "riesgo_vital" in datos:
+        return _a_bool(datos["riesgo_vital"])
+    m = _CAMPO_RIESGO.search(salida)
+    return m.group(1).lower() == "true" if m else None
+
+
+_hilos = ThreadPoolExecutor(max_workers=8)
+
+
 RESPUESTA_SEGURA = (f"Mantente en un lugar seguro y, si puedes hacerlo sin riesgo, quédate cerca de la persona "
                     f"afectada. Si necesitas contacto directo: {CONTACTOS_SEDE}. Cuéntame qué está pasando ahora.")
 
@@ -310,6 +366,8 @@ def _responder_con_modelo(mensajes: list[dict], contexto: dict, senales: list[st
     system = (f"{SYSTEM_PROMPT_CHAT}\n\nMARCO GENERAL (aplica siempre):\n{marco_general()}"
               f"\n\nINCIDENTE REPORTADO:\n{texto_contexto(contexto)}\n\nPROTOCOLOS DISPONIBLES:\n{textos}{alerta}")
 
+    # El historial que ve el detector usa el texto plano del bot, no el JSON que se reenvía al modelo principal
+    detector = _hilos.submit(detectar_riesgo_modelo, _historial_plano(mensajes)) if DETECTOR_RIESGO else None
     datos, uso, intentos = None, {}, []
     for intento in range(2):
         # Segundo intento solo si el primero no trae JSON utilizable: se recuerda el formato al final del prompt
@@ -338,13 +396,14 @@ def _responder_con_modelo(mensajes: list[dict], contexto: dict, senales: list[st
 
     protocolo = datos.get("protocolo")
     riesgo_modelo = _a_bool(datos.get("riesgo_vital", False))
+    riesgo_detector = detector.result() if detector else None
     return {
         "respuesta_texto": str(datos["respuesta_texto"]).strip(),
-        # Las reglas solo pueden subir a true; nunca bajan lo que decidió el modelo
-        "riesgo_vital": riesgo_modelo or bool(senales),
+        # Reglas y detector solo pueden subir a true; nunca bajan lo que decidió el modelo
+        "riesgo_vital": riesgo_modelo or bool(riesgo_detector) or bool(senales),
         "protocolo": str(protocolo) if protocolo else None,
         "metadata": {"protocolos_recuperados": [c for c, _ in protocolos], "senales_regla": senales,
-                     "riesgo_vital_modelo": riesgo_modelo, "tokens": uso,
+                     "riesgo_vital_modelo": riesgo_modelo, "riesgo_vital_detector": riesgo_detector, "tokens": uso,
                      "reintento_json": bool(intentos)},
     }
 

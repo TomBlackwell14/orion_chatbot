@@ -7,7 +7,7 @@ Uso en la EC2:
 
 Cada caso es el mensaje actual del usuario (con historial previo opcional para los casos multi-turno) y su
 etiqueta esperada. Cada caso se repite N veces porque el modelo no responde siempre igual. Se miden tres capas
-por separado: solo reglas (riesgo.py), solo modelo y el sistema completo (lo que recibe NestJS).
+por separado: solo reglas (riesgo.py), solo modelo, solo detector dedicado y el sistema completo (lo que recibe NestJS).
 
 Deja en resultados/riesgo_<fecha>/ un reporte.md con las tablas para la tesis, un observaciones.csv con cada
 llamada y un resumen.json. Termina con código 1 si hay falsos negativos en el peor caso o errores.
@@ -62,11 +62,12 @@ def llamar(responder, caso: dict, pausa: float) -> dict:
             if "Throttling" in type(e).__name__ + str(e) and intento < 2:
                 time.sleep(5 * (intento + 1))
                 continue
-            return {"sistema": False, "modelo": False, "error": f"{type(e).__name__}: {e}"[:800],
+            return {"sistema": False, "modelo": False, "detector": False, "error": f"{type(e).__name__}: {e}"[:800],
                     "ms": int((time.monotonic() - inicio) * 1000), "protocolo": None, "recuperados": "", "respuesta": ""}
     time.sleep(pausa)
     meta = r.get("metadata", {})
-    return {"sistema": bool(r["riesgo_vital"]), "modelo": bool(meta.get("riesgo_vital_modelo")), "error": "",
+    return {"sistema": bool(r["riesgo_vital"]), "modelo": bool(meta.get("riesgo_vital_modelo")),
+            "detector": bool(meta.get("riesgo_vital_detector")), "error": "",
             "ms": int((time.monotonic() - inicio) * 1000), "protocolo": r.get("protocolo"),
             "recuperados": ",".join(meta.get("protocolos_recuperados", [])), "respuesta": r["respuesta_texto"]}
 
@@ -108,10 +109,13 @@ def main() -> int:
     responder = None
     if not args.solo_reglas:
         from rag import responder  # importa boto3 solo cuando se usa Bedrock
-        from config import LLM_MODEL, TEMPERATURE, TOP_K_RESULTS
+        from config import DETECTOR_RIESGO, LLM_MODEL, TEMPERATURE, TOP_K_RESULTS
 
     capas = {"Solo reglas (riesgo.py)": Matriz()} if args.solo_reglas else \
-        {"Solo reglas (riesgo.py)": Matriz(), "Solo modelo": Matriz(), "Sistema completo": Matriz()}
+        {"Solo reglas (riesgo.py)": Matriz(), "Solo modelo": Matriz(), "Solo detector": Matriz(),
+         "Sistema completo": Matriz()}
+    if not args.solo_reglas and not DETECTOR_RIESGO:
+        del capas["Solo detector"]
     peor_caso, por_tipo, por_categoria = Matriz(), defaultdict(Matriz), defaultdict(Matriz)
     estables, errores, observaciones, problemas = 0, 0, [], []
 
@@ -121,11 +125,13 @@ def main() -> int:
         resultados = []
         for rep in range(1, reps + 1):
             if args.solo_reglas:
-                obs = {"sistema": regla, "modelo": None, "error": "", "ms": 0, "protocolo": None,
+                obs = {"sistema": regla, "modelo": None, "detector": None, "error": "", "ms": 0, "protocolo": None,
                        "recuperados": "", "respuesta": ""}
             else:
                 obs = llamar(responder, c, args.pausa)
                 capas["Solo modelo"].agregar(esperado, obs["modelo"])
+                if "Solo detector" in capas:
+                    capas["Solo detector"].agregar(esperado, obs["detector"])
                 capas["Sistema completo"].agregar(esperado, obs["sistema"])
             capas["Solo reglas (riesgo.py)"].agregar(esperado, regla)
             por_tipo[c.get("tipo", "base")].agregar(esperado, obs["sistema"])
@@ -160,6 +166,7 @@ def main() -> int:
                f"- Set: {args.casos} · Casos: {len(casos)} ({n_pos} con riesgo vital, {len(casos) - n_pos} sin) · repeticiones por caso: {reps}"]
     if not args.solo_reglas:
         reporte += [f"- Modelo: `{LLM_MODEL}` · temperatura {TEMPERATURE} · protocolos recuperados (top-k): {TOP_K_RESULTS}",
+                    f"- Detector dedicado de riesgo vital: {'activado' if DETECTOR_RIESGO else 'desactivado'}",
                     f"- Errores de llamada: {errores} (cuentan como riesgo_vital = false, igual que el fallback de NestJS)"]
     reporte += ["", "## Resultado por capa (cada repetición cuenta como una observación)", "", *tabla_capas(capas), ""]
     if not args.solo_reglas:
