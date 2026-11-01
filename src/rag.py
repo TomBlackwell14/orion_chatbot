@@ -9,6 +9,7 @@ Riesgo vital en tres capas:
 3. riesgo.py fuerza riesgo_vital = true ante señales explícitas en el mensaje del usuario.
 """
 import json
+import logging
 import re
 import threading
 from pathlib import Path
@@ -21,6 +22,8 @@ from config import (
     AWS_REGION, CONTACTOS_SEDE, EMBEDDING_DIM, EMBEDDING_MODEL, LLM_MODEL,
     MAX_HISTORIAL, MAX_TOKENS, PROTOCOLOS_PATH, TEMPERATURE, TOP_K_RESULTS,
 )
+
+log = logging.getLogger("orion-chatbot.rag")
 
 # El backend espera como máximo 25 s y /v1/chat hace 2 llamadas (embedding + converse): sin reintentos,
 # cada una toma a lo más 2 + 10 s, así el peor caso (24 s) queda dentro del límite.
@@ -59,7 +62,10 @@ CÓMO RESPONDER:
 5. Decide riesgo_vital con el "CRITERIO GENERAL DE RIESGO VITAL" del MARCO GENERAL. Las señales de cada protocolo
    son ejemplos, no una lista cerrada: cualquier riesgo de muerte o de secuela grave (D.S. 34/2022) cuenta, aunque no
    aparezca en ninguna lista. Una pelea, un sismo, una fractura cerrada o un delito, por sí solos, no son riesgo vital.
-   Si una señal es probable pero no está descrita, deja riesgo_vital = false y pregunta por ella en este mismo mensaje.
+   Si lo que ya se describió basta por sí solo (por ejemplo, signos de vía aérea comprometida, de ACV o de infarto,
+   una pérdida súbita de una función del cuerpo, o alguien que no puede ponerse a salvo por sí mismo ante un peligro),
+   marca riesgo_vital = true de inmediato, también si el afectado es quien escribe: no esperes confirmar otra señal.
+   Solo si la señal grave es posible pero aún no está descrita, deja riesgo_vital = false y pregunta por ella.
 6. Si el mensaje no tiene relación con la emergencia, redirige amablemente al tema.
 
 FORMATO DE SALIDA: responde SOLO con un objeto JSON válido, sin texto adicional ni bloques de código:
@@ -177,6 +183,11 @@ def normalizar_historial(historial: list[dict]) -> list[dict]:
             mensajes.append({"role": rol, "content": [{"text": texto}]})
     while mensajes and mensajes[0]["role"] != "user":
         mensajes.pop(0)  # Converse exige empezar con user (el saludo del bot va como contexto)
+    # El backend guarda solo el texto del bot; se reenvía como JSON para que el modelo no copie el formato y
+    # deje de responder en JSON desde el segundo turno.
+    for m in mensajes:
+        if m["role"] == "assistant":
+            m["content"][0]["text"] = json.dumps({"respuesta_texto": m["content"][0]["text"]}, ensure_ascii=False)
     return mensajes
 
 
@@ -197,15 +208,42 @@ def texto_contexto(contexto: dict) -> str:
 # ---------- Llamadas al modelo ----------
 
 def _parsear_json(texto: str) -> dict | None:
+    """Primer objeto JSON válido del texto. Tolera texto o un segundo objeto antes o después (pasa en
+    conversaciones de varios turnos, donde el modelo a veces imita el formato del historial)."""
     texto = re.sub(r"^```(?:json)?|```$", "", texto.strip(), flags=re.MULTILINE).strip()
-    inicio, fin = texto.find("{"), texto.rfind("}")
-    if inicio == -1 or fin == -1:
+    decodificador, objetos, i = json.JSONDecoder(), [], texto.find("{")
+    while i != -1:
+        try:
+            datos, fin = decodificador.raw_decode(texto, i)
+        except json.JSONDecodeError:
+            i = texto.find("{", i + 1)
+            continue
+        if isinstance(datos, dict):
+            objetos.append(datos)
+        i = texto.find("{", fin)
+    for datos in objetos:  # se prefiere el objeto completo (con riesgo_vital o resumen_ia)
+        if "riesgo_vital" in datos or "resumen_ia" in datos:
+            return datos
+    return objetos[0] if objetos else None
+
+
+_CAMPO_TEXTO = re.compile(r'"respuesta_texto"\s*:\s*"((?:[^"\\]|\\.)*)"', re.DOTALL)
+_CAMPO_RIESGO = re.compile(r'"riesgo_vital"\s*:\s*"?(true|false)', re.IGNORECASE)
+_CAMPO_PROTOCOLO = re.compile(r'"protocolo"\s*:\s*"([^"]*)"')
+
+
+def _rescatar_campos(texto: str) -> dict | None:
+    """Último recurso cuando el JSON viene roto (comillas sin escapar, cortado): saca los campos con regex."""
+    m = _CAMPO_TEXTO.search(texto)
+    if not m:
         return None
     try:
-        datos = json.loads(texto[inicio:fin + 1])
+        respuesta = json.loads(f'"{m.group(1)}"')
     except json.JSONDecodeError:
-        return None
-    return datos if isinstance(datos, dict) else None
+        respuesta = m.group(1)
+    riesgo, protocolo = _CAMPO_RIESGO.search(texto), _CAMPO_PROTOCOLO.search(texto)
+    return {"respuesta_texto": respuesta, "riesgo_vital": bool(riesgo) and riesgo.group(1).lower() == "true",
+            "protocolo": protocolo.group(1) if protocolo else None}
 
 
 def _a_bool(valor) -> bool:
@@ -221,7 +259,8 @@ def _converse(system: str, mensajes: list[dict]) -> tuple[str, dict]:
         messages=mensajes,
         inferenceConfig={"maxTokens": MAX_TOKENS, "temperature": TEMPERATURE},
     )
-    return resp["output"]["message"]["content"][0]["text"], resp.get("usage", {})
+    uso = {**resp.get("usage", {}), "stop_reason": resp.get("stopReason")}
+    return resp["output"]["message"]["content"][0]["text"], uso
 
 
 def responder(historial: list[dict], contexto: dict | None = None) -> dict:
@@ -254,6 +293,10 @@ RESPUESTA_SEGURA = (f"Mantente en un lugar seguro y, si puedes hacerlo sin riesg
                     f"afectada. Si necesitas contacto directo: {CONTACTOS_SEDE}. Cuéntame qué está pasando ahora.")
 
 
+RECORDATORIO_JSON = ("\n\nFORMATO OBLIGATORIO: responde con UN solo objeto JSON válido con las claves respuesta_texto, "
+                     "riesgo_vital y protocolo, sin texto antes ni después. Escapa las comillas dentro de los textos.")
+
+
 def _responder_con_modelo(mensajes: list[dict], contexto: dict, senales: list[str]) -> dict:
     protocolos = buscar_contexto(consulta_para_busqueda(mensajes, contexto))
     textos = "\n\n---\n\n".join(f"[{codigo}]\n{texto}" for codigo, texto in protocolos) or "(ninguno)"
@@ -265,10 +308,31 @@ def _responder_con_modelo(mensajes: list[dict], contexto: dict, senales: list[st
     system = (f"{SYSTEM_PROMPT_CHAT}\n\nMARCO GENERAL (aplica siempre):\n{marco_general()}"
               f"\n\nINCIDENTE REPORTADO:\n{texto_contexto(contexto)}\n\nPROTOCOLOS DISPONIBLES:\n{textos}{alerta}")
 
-    salida, uso = _converse(system, mensajes)
-    datos = _parsear_json(salida)
-    if not datos or not str(datos.get("respuesta_texto", "")).strip():
-        raise ValueError(f"Respuesta del modelo no es JSON válido ({len(salida)} caracteres)")
+    datos, uso, intentos = None, {}, []
+    for intento in range(2):
+        # Segundo intento solo si el primero no trae JSON utilizable: se recuerda el formato al final del prompt
+        extra = "" if intento == 0 else RECORDATORIO_JSON
+        salida, uso = _converse(system + extra, mensajes)
+        datos = _parsear_json(salida)
+        if not datos or not str(datos.get("respuesta_texto", "")).strip():
+            datos = _rescatar_campos(salida)
+        if not datos and salida.strip() and "{" not in salida:
+            # Texto plano en vez de JSON: se usa igual; riesgo_vital queda solo con las reglas
+            log.warning("respuesta del modelo sin JSON (%d caracteres); se usa como texto", len(salida))
+            datos = {"respuesta_texto": salida.strip(), "riesgo_vital": False, "protocolo": None}
+        utilizable = datos and str(datos.get("respuesta_texto", "")).strip()
+        # Sin riesgo_vital el modelo imitó el formato del historial ({"respuesta_texto": ...}): se reintenta
+        # para no perder la detección; en el segundo intento se acepta lo que haya
+        if utilizable and ("riesgo_vital" in datos or intento == 1):
+            break
+        if utilizable:
+            intentos.append(f"[sin riesgo_vital] {salida[:300]!r}")
+            continue
+        intentos.append(f"[{uso.get('stop_reason')}] {salida[:300]!r}")
+        log.warning("respuesta del modelo no es JSON válido (intento %d, %s): %r",
+                    intento + 1, uso.get("stop_reason"), salida[:500])
+    if not (datos and str(datos.get("respuesta_texto", "")).strip()):
+        raise ValueError(f"Respuesta del modelo no es JSON válido tras 2 intentos: {' | '.join(intentos)}")
 
     protocolo = datos.get("protocolo")
     riesgo_modelo = _a_bool(datos.get("riesgo_vital", False))
@@ -278,7 +342,8 @@ def _responder_con_modelo(mensajes: list[dict], contexto: dict, senales: list[st
         "riesgo_vital": riesgo_modelo or bool(senales),
         "protocolo": str(protocolo) if protocolo else None,
         "metadata": {"protocolos_recuperados": [c for c, _ in protocolos], "senales_regla": senales,
-                     "riesgo_vital_modelo": riesgo_modelo, "tokens": uso},
+                     "riesgo_vital_modelo": riesgo_modelo, "tokens": uso,
+                     "reintento_json": bool(intentos)},
     }
 
 

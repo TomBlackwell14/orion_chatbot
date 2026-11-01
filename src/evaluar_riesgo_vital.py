@@ -26,11 +26,15 @@ from riesgo import detectar_senales
 
 RAIZ = Path(__file__).resolve().parent.parent
 CASOS = RAIZ / "docs" / "casos_riesgo_vital.json"
+# Set de validación: frases nuevas escritas después de la primera corrida y que NO se usaron para ajustar reglas ni
+# prompt. Sirve para mostrar que las mejoras generalizan y no solo memorizan los casos del set principal.
+CASOS_VALIDACION = RAIZ / "docs" / "casos_riesgo_vital_validacion.json"
 SALUDO = {"rol": "bot", "texto": "Hola, soy el asistente de ORION. ¿Qué está pasando ahora?"}
 
 
 def cargar_casos(args) -> list[dict]:
-    casos = json.loads(CASOS.read_text(encoding="utf-8"))
+    ruta = CASOS_VALIDACION if args.casos == "validacion" else CASOS
+    casos = json.loads(ruta.read_text(encoding="utf-8"))
     if args.ids:
         ids = {int(i) for i in args.ids.split(",")}
         casos = [c for c in casos if c["id"] in ids]
@@ -58,7 +62,7 @@ def llamar(responder, caso: dict, pausa: float) -> dict:
             if "Throttling" in type(e).__name__ + str(e) and intento < 2:
                 time.sleep(5 * (intento + 1))
                 continue
-            return {"sistema": False, "modelo": False, "error": f"{type(e).__name__}: {e}"[:200],
+            return {"sistema": False, "modelo": False, "error": f"{type(e).__name__}: {e}"[:800],
                     "ms": int((time.monotonic() - inicio) * 1000), "protocolo": None, "recuperados": "", "respuesta": ""}
     time.sleep(pausa)
     meta = r.get("metadata", {})
@@ -91,6 +95,8 @@ def main() -> int:
     p.add_argument("--tipo", help="filtra por tipo: multiturno, sin_palabra_clave, falsa_alarma, ...")
     p.add_argument("--categoria", help="Salud, Infraestructura o Seguridad")
     p.add_argument("--pausa", type=float, default=0.0, help="segundos entre llamadas, por si Bedrock limita")
+    p.add_argument("--casos", choices=["principal", "validacion"], default="principal",
+                   help="set de casos: principal (152) o validacion (frases nuevas)")
     p.add_argument("--salida", default=str(RAIZ / "resultados"))
     args = p.parse_args()
 
@@ -141,7 +147,8 @@ def main() -> int:
             problemas.append((c, detecciones, resultados))
 
     fecha = datetime.now().strftime("%Y-%m-%d_%H%M")
-    carpeta = Path(args.salida) / f"riesgo_{fecha}{'_reglas' if args.solo_reglas else ''}"
+    sufijo = ("_validacion" if args.casos == "validacion" else "") + ("_reglas" if args.solo_reglas else "")
+    carpeta = Path(args.salida) / f"riesgo_{fecha}{sufijo}"
     carpeta.mkdir(parents=True, exist_ok=True)
     with (carpeta / "observaciones.csv").open("w", newline="", encoding="utf-8") as f:
         w = csv.DictWriter(f, fieldnames=list(observaciones[0].keys()))
@@ -150,7 +157,7 @@ def main() -> int:
 
     n_pos = sum(c["esperado_riesgo_vital"] for c in casos)
     reporte = [f"# Evaluación de riesgo vital · {fecha}", "",
-               f"- Casos: {len(casos)} ({n_pos} con riesgo vital, {len(casos) - n_pos} sin) · repeticiones por caso: {reps}"]
+               f"- Set: {args.casos} · Casos: {len(casos)} ({n_pos} con riesgo vital, {len(casos) - n_pos} sin) · repeticiones por caso: {reps}"]
     if not args.solo_reglas:
         reporte += [f"- Modelo: `{LLM_MODEL}` · temperatura {TEMPERATURE} · protocolos recuperados (top-k): {TOP_K_RESULTS}",
                     f"- Errores de llamada: {errores} (cuentan como riesgo_vital = false, igual que el fallback de NestJS)"]
