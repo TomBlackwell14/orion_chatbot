@@ -1,0 +1,1609 @@
+[
+ {
+  "id": 1,
+  "categoria": "Salud",
+  "subcategoria": "Urgencia",
+  "mensaje": "Se desmayó y no responde aunque le hablo",
+  "esperado_riesgo_vital": true,
+  "debe_activar_regla": true,
+  "tipo": "base"
+ },
+ {
+  "id": 2,
+  "categoria": "Salud",
+  "subcategoria": "Urgencia",
+  "mensaje": "No respira, creo que dejó de respirar",
+  "esperado_riesgo_vital": true,
+  "debe_activar_regla": true,
+  "tipo": "base"
+ },
+ {
+  "id": 3,
+  "categoria": "Salud",
+  "subcategoria": "Urgencia",
+  "mensaje": "Está convulsionando en el suelo",
+  "esperado_riesgo_vital": true,
+  "debe_activar_regla": true,
+  "tipo": "base"
+ },
+ {
+  "id": 4,
+  "categoria": "Salud",
+  "subcategoria": "Urgencia",
+  "mensaje": "Tiene los labios morados y le cuesta hablar",
+  "esperado_riesgo_vital": true,
+  "debe_activar_regla": true,
+  "tipo": "base"
+ },
+ {
+  "id": 5,
+  "categoria": "Salud",
+  "subcategoria": "Urgencia",
+  "mensaje": "Le duele mucho el pecho hace 10 minutos y está sudando frío",
+  "esperado_riesgo_vital": true,
+  "debe_activar_regla": false,
+  "tipo": "base"
+ },
+ {
+  "id": 6,
+  "categoria": "Salud",
+  "subcategoria": "Urgencia",
+  "mensaje": "Se le hinchó la cara y la lengua después de comer maní",
+  "esperado_riesgo_vital": true,
+  "debe_activar_regla": false,
+  "tipo": "base"
+ },
+ {
+  "id": 7,
+  "categoria": "Salud",
+  "subcategoria": "Urgencia",
+  "mensaje": "De repente no puede mover el brazo derecho y habla raro",
+  "esperado_riesgo_vital": true,
+  "debe_activar_regla": false,
+  "tipo": "base"
+ },
+ {
+  "id": 8,
+  "categoria": "Salud",
+  "subcategoria": "Urgencia",
+  "mensaje": "Ya despertó, está consciente y respira normal",
+  "esperado_riesgo_vital": false,
+  "debe_activar_regla": false,
+  "tipo": "base"
+ },
+ {
+  "id": 9,
+  "categoria": "Salud",
+  "subcategoria": "Urgencia",
+  "mensaje": "Respira bien, no respira con dificultad, solo está mareada",
+  "esperado_riesgo_vital": false,
+  "debe_activar_regla": false,
+  "tipo": "base"
+ },
+ {
+  "id": 10,
+  "categoria": "Salud",
+  "subcategoria": "Malestar",
+  "mensaje": "Me duele la cabeza y estoy un poco mareado",
+  "esperado_riesgo_vital": false,
+  "debe_activar_regla": false,
+  "tipo": "base"
+ },
+ {
+  "id": 11,
+  "categoria": "Salud",
+  "subcategoria": "Malestar",
+  "mensaje": "Tiene náuseas pero está bien, conversando",
+  "esperado_riesgo_vital": false,
+  "debe_activar_regla": false,
+  "tipo": "base"
+ },
+ {
+  "id": 12,
+  "categoria": "Salud",
+  "subcategoria": "Lesiones / Accidentes",
+  "mensaje": "Se cayó de la escalera del segundo piso y no siente las piernas",
+  "esperado_riesgo_vital": true,
+  "debe_activar_regla": false,
+  "tipo": "base"
+ },
+ {
+  "id": 13,
+  "categoria": "Salud",
+  "subcategoria": "Lesiones / Accidentes",
+  "mensaje": "Se cortó la mano y sangra mucho, no para de sangrar",
+  "esperado_riesgo_vital": true,
+  "debe_activar_regla": true,
+  "tipo": "base"
+ },
+ {
+  "id": 14,
+  "categoria": "Salud",
+  "subcategoria": "Lesiones / Accidentes",
+  "mensaje": "Se torció el tobillo jugando, le duele harto",
+  "esperado_riesgo_vital": false,
+  "debe_activar_regla": false,
+  "tipo": "base"
+ },
+ {
+  "id": 15,
+  "categoria": "Salud",
+  "subcategoria": "Lesiones / Accidentes",
+  "mensaje": "Se cortó con un cuchillo en el casino picando pan, sangra poco",
+  "esperado_riesgo_vital": false,
+  "debe_activar_regla": false,
+  "tipo": "base"
+ },
+ {
+  "id": 16,
+  "categoria": "Salud",
+  "subcategoria": "Lesiones / Accidentes",
+  "mensaje": "Se quemó la mano con agua caliente, una zona chica",
+  "esperado_riesgo_vital": false,
+  "debe_activar_regla": false,
+  "tipo": "base"
+ },
+ {
+  "id": 17,
+  "categoria": "Salud",
+  "subcategoria": "Salud Mental / Emocional",
+  "mensaje": "Mi compañero dice que se quiere matar y tiene pastillas",
+  "esperado_riesgo_vital": true,
+  "debe_activar_regla": true,
+  "tipo": "base"
+ },
+ {
+  "id": 18,
+  "categoria": "Salud",
+  "subcategoria": "Salud Mental / Emocional",
+  "mensaje": "Está llorando mucho y no quiere hablar con nadie",
+  "esperado_riesgo_vital": false,
+  "debe_activar_regla": false,
+  "tipo": "base"
+ },
+ {
+  "id": 19,
+  "categoria": "Salud",
+  "subcategoria": "Salud Mental / Emocional",
+  "mensaje": "Me quiero morir, ya no aguanto más",
+  "esperado_riesgo_vital": true,
+  "debe_activar_regla": true,
+  "tipo": "base"
+ },
+ {
+  "id": 20,
+  "categoria": "Salud",
+  "subcategoria": "Salud Mental / Emocional",
+  "mensaje": "Está en la baranda del cuarto piso y dice que va a saltar",
+  "esperado_riesgo_vital": true,
+  "debe_activar_regla": false,
+  "tipo": "base"
+ },
+ {
+  "id": 21,
+  "categoria": "Infraestructura",
+  "subcategoria": "Incendio / Explosión",
+  "mensaje": "Hay humo en el laboratorio y quedó una persona atrapada en el fuego",
+  "esperado_riesgo_vital": true,
+  "debe_activar_regla": true,
+  "tipo": "base"
+ },
+ {
+  "id": 22,
+  "categoria": "Infraestructura",
+  "subcategoria": "Incendio / Explosión",
+  "mensaje": "Se prendió un basurero, ya salimos todos",
+  "esperado_riesgo_vital": false,
+  "debe_activar_regla": false,
+  "tipo": "base"
+ },
+ {
+  "id": 23,
+  "categoria": "Infraestructura",
+  "subcategoria": "Incendio / Explosión",
+  "mensaje": "El tanque de gas está inflado y muy caliente, hay gente cerca",
+  "esperado_riesgo_vital": true,
+  "debe_activar_regla": false,
+  "tipo": "base"
+ },
+ {
+  "id": 24,
+  "categoria": "Infraestructura",
+  "subcategoria": "Servicios Básicos",
+  "mensaje": "Se cortó la luz en el edificio C",
+  "esperado_riesgo_vital": false,
+  "debe_activar_regla": false,
+  "tipo": "base"
+ },
+ {
+  "id": 25,
+  "categoria": "Infraestructura",
+  "subcategoria": "Servicios Básicos",
+  "mensaje": "Huele a gas en la cocina, no hay nadie mareado",
+  "esperado_riesgo_vital": false,
+  "debe_activar_regla": false,
+  "tipo": "base"
+ },
+ {
+  "id": 26,
+  "categoria": "Infraestructura",
+  "subcategoria": "Servicios Básicos",
+  "mensaje": "Un trabajador recibió una descarga y está pegado al tablero",
+  "esperado_riesgo_vital": true,
+  "debe_activar_regla": true,
+  "tipo": "base"
+ },
+ {
+  "id": 27,
+  "categoria": "Infraestructura",
+  "subcategoria": "Servicios Básicos",
+  "mensaje": "Se quemó la bomba de agua del edificio B",
+  "esperado_riesgo_vital": false,
+  "debe_activar_regla": false,
+  "tipo": "base"
+ },
+ {
+  "id": 28,
+  "categoria": "Infraestructura",
+  "subcategoria": "Riesgo Estructural",
+  "mensaje": "Hay una grieta grande en la columna, no hay nadie cerca",
+  "esperado_riesgo_vital": false,
+  "debe_activar_regla": false,
+  "tipo": "base"
+ },
+ {
+  "id": 29,
+  "categoria": "Infraestructura",
+  "subcategoria": "Riesgo Estructural",
+  "mensaje": "Se cayó parte del techo y hay alguien atrapado bajo escombros",
+  "esperado_riesgo_vital": true,
+  "debe_activar_regla": true,
+  "tipo": "base"
+ },
+ {
+  "id": 30,
+  "categoria": "Infraestructura",
+  "subcategoria": "Evacuación / Desastre Natural",
+  "mensaje": "Tembló fuerte, estamos todos afuera bien",
+  "esperado_riesgo_vital": false,
+  "debe_activar_regla": false,
+  "tipo": "base"
+ },
+ {
+  "id": 31,
+  "categoria": "Infraestructura",
+  "subcategoria": "Evacuación / Desastre Natural",
+  "mensaje": "Después del temblor quedó una persona en silla de ruedas en el tercer piso y hay grietas",
+  "esperado_riesgo_vital": true,
+  "debe_activar_regla": false,
+  "tipo": "base"
+ },
+ {
+  "id": 32,
+  "categoria": "Seguridad",
+  "subcategoria": "Violencia interpersonal",
+  "mensaje": "Hay una pelea afuera del edificio A, solo empujones",
+  "esperado_riesgo_vital": false,
+  "debe_activar_regla": false,
+  "tipo": "base"
+ },
+ {
+  "id": 33,
+  "categoria": "Seguridad",
+  "subcategoria": "Violencia interpersonal",
+  "mensaje": "Uno de los que pelean sacó un arma",
+  "esperado_riesgo_vital": true,
+  "debe_activar_regla": true,
+  "tipo": "base"
+ },
+ {
+  "id": 34,
+  "categoria": "Seguridad",
+  "subcategoria": "Violencia interpersonal",
+  "mensaje": "Están pateando a uno que está en el suelo y ya no se mueve",
+  "esperado_riesgo_vital": true,
+  "debe_activar_regla": false,
+  "tipo": "base"
+ },
+ {
+  "id": 35,
+  "categoria": "Seguridad",
+  "subcategoria": "Violencia interpersonal",
+  "mensaje": "Están discutiendo fuerte, no hay armas ni heridos",
+  "esperado_riesgo_vital": false,
+  "debe_activar_regla": false,
+  "tipo": "base"
+ },
+ {
+  "id": 36,
+  "categoria": "Seguridad",
+  "subcategoria": "Amenazas críticas",
+  "mensaje": "Llegó un correo que dice que hay una bomba en el edificio P",
+  "esperado_riesgo_vital": true,
+  "debe_activar_regla": true,
+  "tipo": "base"
+ },
+ {
+  "id": 37,
+  "categoria": "Seguridad",
+  "subcategoria": "Amenazas críticas",
+  "mensaje": "Escuché disparos en el estacionamiento",
+  "esperado_riesgo_vital": true,
+  "debe_activar_regla": true,
+  "tipo": "base"
+ },
+ {
+  "id": 38,
+  "categoria": "Seguridad",
+  "subcategoria": "Delitos / conductas ilícitas",
+  "mensaje": "Me robaron el notebook de la sala",
+  "esperado_riesgo_vital": false,
+  "debe_activar_regla": false,
+  "tipo": "base"
+ },
+ {
+  "id": 39,
+  "categoria": "Seguridad",
+  "subcategoria": "Delitos / conductas ilícitas",
+  "mensaje": "Un tipo armado está asaltando en el casino",
+  "esperado_riesgo_vital": true,
+  "debe_activar_regla": true,
+  "tipo": "base"
+ },
+ {
+  "id": 40,
+  "categoria": "Seguridad",
+  "subcategoria": "Orden público / sospecha",
+  "mensaje": "Hay un hombre merodeando los autos hace rato",
+  "esperado_riesgo_vital": false,
+  "debe_activar_regla": false,
+  "tipo": "base"
+ },
+ {
+  "id": 41,
+  "categoria": "Seguridad",
+  "subcategoria": "Orden público / sospecha",
+  "mensaje": "Hay una mochila abandonada hace 3 horas, nadie dice nada de bomba",
+  "esperado_riesgo_vital": false,
+  "debe_activar_regla": false,
+  "tipo": "base"
+ },
+ {
+  "id": 42,
+  "categoria": "Salud",
+  "subcategoria": "Urgencia",
+  "mensaje": "Está tirado en el suelo y no reacciona na, le muevo el hombro y nada",
+  "esperado_riesgo_vital": true,
+  "debe_activar_regla": true,
+  "tipo": "coloquial",
+  "justificacion": "GEN-000 3.3 A: no responde"
+ },
+ {
+  "id": 43,
+  "categoria": "Salud",
+  "subcategoria": "Urgencia",
+  "mensaje": "no rrespira bien y tiene la cara media azul",
+  "esperado_riesgo_vital": true,
+  "debe_activar_regla": false,
+  "tipo": "tipeo",
+  "justificacion": "SAL-001 7: cianosis y respiración alterada"
+ },
+ {
+  "id": 44,
+  "categoria": "Salud",
+  "subcategoria": "Urgencia",
+  "mensaje": "Parece que no está respirando, no sé bien",
+  "esperado_riesgo_vital": true,
+  "debe_activar_regla": true,
+  "tipo": "duda",
+  "justificacion": "GEN-000 3.4: señal descrita con duda cuenta"
+ },
+ {
+  "id": 45,
+  "categoria": "Salud",
+  "subcategoria": "Urgencia",
+  "mensaje": "Le está costando mucho respirar, hace ruido como silbido y no puede terminar una frase",
+  "esperado_riesgo_vital": true,
+  "debe_activar_regla": false,
+  "tipo": "sin_palabra_clave",
+  "justificacion": "SAL-001 7: respira con ruido y mucha dificultad"
+ },
+ {
+  "id": 46,
+  "categoria": "Salud",
+  "subcategoria": "Urgencia",
+  "mensaje": "Es diabético, está sudando entero, confundido y ya casi no habla",
+  "esperado_riesgo_vital": true,
+  "debe_activar_regla": false,
+  "tipo": "sin_palabra_clave",
+  "justificacion": "SAL-001 7: confusión repentina y empeoramiento rápido"
+ },
+ {
+  "id": 47,
+  "categoria": "Salud",
+  "subcategoria": "Urgencia",
+  "mensaje": "Se le cayó la cara de un lado y no puede levantar el brazo",
+  "esperado_riesgo_vital": true,
+  "debe_activar_regla": false,
+  "tipo": "sin_palabra_clave",
+  "justificacion": "SAL-001 7: signos de ACV"
+ },
+ {
+  "id": 48,
+  "categoria": "Salud",
+  "subcategoria": "Urgencia",
+  "mensaje": "Lo picó una abeja y se le está cerrando la garganta",
+  "esperado_riesgo_vital": true,
+  "debe_activar_regla": false,
+  "tipo": "sin_palabra_clave",
+  "justificacion": "SAL-001 7: reacción alérgica con dificultad para respirar"
+ },
+ {
+  "id": 49,
+  "categoria": "Salud",
+  "subcategoria": "Urgencia",
+  "mensaje": "Le duele el pecho fuerte hace rato, el dolor se le va al brazo izquierdo y no se le pasa sentado",
+  "esperado_riesgo_vital": true,
+  "debe_activar_regla": false,
+  "tipo": "sin_palabra_clave",
+  "justificacion": "SAL-001 7: dolor de pecho que no cede con reposo"
+ },
+ {
+  "id": 50,
+  "categoria": "Salud",
+  "subcategoria": "Urgencia",
+  "mensaje": "Está pálido entero, frío y cada minuto está peor",
+  "esperado_riesgo_vital": true,
+  "debe_activar_regla": false,
+  "tipo": "sin_palabra_clave",
+  "justificacion": "SAL-001 7: palidez extrema y empeoramiento rápido"
+ },
+ {
+  "id": 51,
+  "categoria": "Salud",
+  "subcategoria": "Urgencia",
+  "mensaje": "Convulsionó dos veces seguidas y no ha despertado entre medio",
+  "esperado_riesgo_vital": true,
+  "debe_activar_regla": true,
+  "tipo": "directo",
+  "justificacion": "SAL-001 7: convulsión repetida sin recuperar conciencia"
+ },
+ {
+  "id": 52,
+  "categoria": "Salud",
+  "subcategoria": "Urgencia",
+  "mensaje": "Me duele mucho el pecho y me falta el aire, estoy solo en la sala",
+  "esperado_riesgo_vital": true,
+  "debe_activar_regla": false,
+  "tipo": "reportante_afectado",
+  "justificacion": "GEN-000 4.2 y SAL-001 7: el reportante es el afectado"
+ },
+ {
+  "id": 53,
+  "categoria": "Salud",
+  "subcategoria": "Urgencia",
+  "mensaje": "Tuvo una convulsión corta, ya pasó, está despierto y me reconoce",
+  "esperado_riesgo_vital": false,
+  "debe_activar_regla": true,
+  "tipo": "resuelto",
+  "justificacion": "GEN-000 3.5: la señal ya no está presente. Falso positivo conocido de la regla: la red de seguridad prefiere sobrealertar"
+ },
+ {
+  "id": 54,
+  "categoria": "Salud",
+  "subcategoria": "Urgencia",
+  "mensaje": "Se desmayó unos segundos pero ya se recuperó y está conversando",
+  "esperado_riesgo_vital": false,
+  "debe_activar_regla": false,
+  "tipo": "resuelto",
+  "justificacion": "SAL-001 7 exige pérdida que no se recupera; ahora responde"
+ },
+ {
+  "id": 55,
+  "categoria": "Salud",
+  "subcategoria": "Urgencia",
+  "mensaje": "Está consciente, respira normal y no está sangrando, solo se ve débil",
+  "esperado_riesgo_vital": false,
+  "debe_activar_regla": false,
+  "tipo": "negacion",
+  "justificacion": "GEN-000 3.5: descarta las señales"
+ },
+ {
+  "id": 56,
+  "categoria": "Salud",
+  "subcategoria": "Urgencia",
+  "mensaje": "Me muero de sueño, llevo dos noches sin dormir estudiando",
+  "esperado_riesgo_vital": false,
+  "debe_activar_regla": false,
+  "tipo": "falsa_alarma",
+  "justificacion": "Expresión coloquial, sin amenaza a la vida"
+ },
+ {
+  "id": 57,
+  "categoria": "Salud",
+  "subcategoria": "Urgencia",
+  "mensaje": "Se puso mal de repente en clases",
+  "esperado_riesgo_vital": false,
+  "debe_activar_regla": false,
+  "tipo": "ambiguo",
+  "justificacion": "GEN-000 3.5: sin señal concreta; el bot debe preguntar por conciencia y respiración"
+ },
+ {
+  "id": 58,
+  "categoria": "Salud",
+  "subcategoria": "Urgencia",
+  "mensaje": "no",
+  "esperado_riesgo_vital": true,
+  "debe_activar_regla": false,
+  "tipo": "multiturno",
+  "justificacion": "La respuesta 'no' a '¿respira?' es una señal de riesgo vital",
+  "historial_previo": [
+   {
+    "rol": "bot",
+    "texto": "Hola, soy el asistente de ORION. ¿Qué está pasando ahora?"
+   },
+   {
+    "rol": "usuario",
+    "texto": "Mi compañera se desplomó en el pasillo"
+   },
+   {
+    "rol": "bot",
+    "texto": "Quédate con ella y no la dejes sola. ¿Responde cuando le hablas? ¿Respira?"
+   }
+  ]
+ },
+ {
+  "id": 59,
+  "categoria": "Salud",
+  "subcategoria": "Urgencia",
+  "mensaje": "sí, ahora sí responde y respira normal",
+  "esperado_riesgo_vital": false,
+  "debe_activar_regla": false,
+  "tipo": "multiturno",
+  "justificacion": "El reportante descarta las señales por las que preguntó el bot",
+  "historial_previo": [
+   {
+    "rol": "bot",
+    "texto": "Hola, soy el asistente de ORION. ¿Qué está pasando ahora?"
+   },
+   {
+    "rol": "usuario",
+    "texto": "Mi compañera se desplomó en el pasillo"
+   },
+   {
+    "rol": "bot",
+    "texto": "Quédate con ella y no la dejes sola. ¿Responde cuando le hablas? ¿Respira?"
+   }
+  ]
+ },
+ {
+  "id": 60,
+  "categoria": "Salud",
+  "subcategoria": "Urgencia",
+  "mensaje": "sigue igual, con los ojos cerrados",
+  "esperado_riesgo_vital": true,
+  "debe_activar_regla": false,
+  "tipo": "multiturno",
+  "justificacion": "GEN-000 3.4: la señal (no responde) apareció antes y no fue descartada",
+  "historial_previo": [
+   {
+    "rol": "bot",
+    "texto": "Hola, soy el asistente de ORION. ¿Qué está pasando ahora?"
+   },
+   {
+    "rol": "usuario",
+    "texto": "Se desmayó y no responde"
+   },
+   {
+    "rol": "bot",
+    "texto": "Quédate con la persona y no la dejes sola. ¿Respira?"
+   },
+   {
+    "rol": "usuario",
+    "texto": "creo que sí respira"
+   },
+   {
+    "rol": "bot",
+    "texto": "Si respira y no hubo golpe, ponla de lado y vigila que siga respirando. ¿Ya abrió los ojos o responde?"
+   }
+  ]
+ },
+ {
+  "id": 61,
+  "categoria": "Salud",
+  "subcategoria": "Malestar",
+  "mensaje": "Tengo dolor de guata desde la mañana, pero puedo caminar bien",
+  "esperado_riesgo_vital": false,
+  "debe_activar_regla": false,
+  "tipo": "directo",
+  "justificacion": "SAL-002: malestar sin señales de alarma"
+ },
+ {
+  "id": 62,
+  "categoria": "Salud",
+  "subcategoria": "Malestar",
+  "mensaje": "Ando con la presión baja, me siento media volada",
+  "esperado_riesgo_vital": false,
+  "debe_activar_regla": false,
+  "tipo": "coloquial",
+  "justificacion": "SAL-002: mareo leve; preguntar si está consciente y respira normal"
+ },
+ {
+  "id": 63,
+  "categoria": "Salud",
+  "subcategoria": "Malestar",
+  "mensaje": "Mi amiga tiene fiebre y tos, está sentada conversando",
+  "esperado_riesgo_vital": false,
+  "debe_activar_regla": false,
+  "tipo": "directo",
+  "justificacion": "SAL-002: síntomas sin emergencia"
+ },
+ {
+  "id": 64,
+  "categoria": "Salud",
+  "subcategoria": "Malestar",
+  "mensaje": "Estaba mareado y ahora de repente no puede hablar bien y está confundido",
+  "esperado_riesgo_vital": true,
+  "debe_activar_regla": false,
+  "tipo": "sin_palabra_clave",
+  "justificacion": "SAL-002 7: confusión y alteración del lenguaje"
+ },
+ {
+  "id": 65,
+  "categoria": "Salud",
+  "subcategoria": "Malestar",
+  "mensaje": "Le dolía la cabeza y se desmayó un momento",
+  "esperado_riesgo_vital": true,
+  "debe_activar_regla": false,
+  "tipo": "sin_palabra_clave",
+  "justificacion": "SAL-002 7: pierde el conocimiento aunque sea por segundos"
+ },
+ {
+  "id": 66,
+  "categoria": "Salud",
+  "subcategoria": "Malestar",
+  "mensaje": "Tenía náuseas pero en los últimos minutos empeoró mucho, casi no puede mantenerse despierto",
+  "esperado_riesgo_vital": true,
+  "debe_activar_regla": false,
+  "tipo": "sin_palabra_clave",
+  "justificacion": "SAL-002 7: empeora en cuestión de minutos"
+ },
+ {
+  "id": 67,
+  "categoria": "Salud",
+  "subcategoria": "Malestar",
+  "mensaje": "Este ramo me va a matar, estoy con dolor de cabeza",
+  "esperado_riesgo_vital": false,
+  "debe_activar_regla": false,
+  "tipo": "falsa_alarma",
+  "justificacion": "Expresión coloquial"
+ },
+ {
+  "id": 68,
+  "categoria": "Salud",
+  "subcategoria": "Malestar",
+  "mensaje": "Está con vómitos, pero responde bien y respira sin problema",
+  "esperado_riesgo_vital": false,
+  "debe_activar_regla": false,
+  "tipo": "negacion",
+  "justificacion": "Señal de alerta sin riesgo vital confirmado"
+ },
+ {
+  "id": 69,
+  "categoria": "Salud",
+  "subcategoria": "Lesiones / Accidentes",
+  "mensaje": "Se sacó la cresta en bici, tiene el brazo raro pero está hablando bien",
+  "esperado_riesgo_vital": false,
+  "debe_activar_regla": false,
+  "tipo": "coloquial",
+  "justificacion": "SAL-003: posible fractura sin señales de riesgo vital"
+ },
+ {
+  "id": 70,
+  "categoria": "Salud",
+  "subcategoria": "Lesiones / Accidentes",
+  "mensaje": "Se golpeó la cabeza con la puerta, tiene un chichón",
+  "esperado_riesgo_vital": false,
+  "debe_activar_regla": false,
+  "tipo": "directo",
+  "justificacion": "SAL-003: golpe sin síntomas de alarma"
+ },
+ {
+  "id": 71,
+  "categoria": "Salud",
+  "subcategoria": "Lesiones / Accidentes",
+  "mensaje": "Se golpeó la cabeza, está vomitando y se está quedando dormido",
+  "esperado_riesgo_vital": true,
+  "debe_activar_regla": false,
+  "tipo": "sin_palabra_clave",
+  "justificacion": "SAL-003 7: golpe en cabeza con vómitos y somnolencia"
+ },
+ {
+  "id": 72,
+  "categoria": "Salud",
+  "subcategoria": "Lesiones / Accidentes",
+  "mensaje": "Se cayó del techo del gimnasio, como 6 metros, le duele el cuello",
+  "esperado_riesgo_vital": true,
+  "debe_activar_regla": false,
+  "tipo": "sin_palabra_clave",
+  "justificacion": "SAL-003 7: caída de altura con dolor de cuello"
+ },
+ {
+  "id": 73,
+  "categoria": "Salud",
+  "subcategoria": "Lesiones / Accidentes",
+  "mensaje": "Le cayó un estante metálico encima y no lo podemos sacar",
+  "esperado_riesgo_vital": true,
+  "debe_activar_regla": false,
+  "tipo": "sin_palabra_clave",
+  "justificacion": "SAL-003 7: atrapado o aplastado por objeto pesado"
+ },
+ {
+  "id": 74,
+  "categoria": "Salud",
+  "subcategoria": "Lesiones / Accidentes",
+  "mensaje": "Hay mucha sangre, se cortó la pierna con un vidrio y no deja de salir",
+  "esperado_riesgo_vital": true,
+  "debe_activar_regla": true,
+  "tipo": "directo",
+  "justificacion": "SAL-003 7: sangrado abundante que no cede"
+ },
+ {
+  "id": 75,
+  "categoria": "Salud",
+  "subcategoria": "Lesiones / Accidentes",
+  "mensaje": "Se le derramó ácido en la cara en el laboratorio y le cuesta respirar",
+  "esperado_riesgo_vital": true,
+  "debe_activar_regla": false,
+  "tipo": "sin_palabra_clave",
+  "justificacion": "SAL-003 7: quemadura química en cara con dificultad para respirar"
+ },
+ {
+  "id": 76,
+  "categoria": "Salud",
+  "subcategoria": "Lesiones / Accidentes",
+  "mensaje": "Le sale sangre de la nariz por un pelotazo",
+  "esperado_riesgo_vital": false,
+  "debe_activar_regla": false,
+  "tipo": "par",
+  "justificacion": "Par con el siguiente: sangrado menor"
+ },
+ {
+  "id": 77,
+  "categoria": "Salud",
+  "subcategoria": "Lesiones / Accidentes",
+  "mensaje": "Le sale sangre de la cabeza por un fierrazo y está confundido",
+  "esperado_riesgo_vital": true,
+  "debe_activar_regla": false,
+  "tipo": "par",
+  "justificacion": "SAL-003 7: golpe en cabeza con confusión"
+ },
+ {
+  "id": 78,
+  "categoria": "Salud",
+  "subcategoria": "Lesiones / Accidentes",
+  "mensaje": "Sangraba harto pero con presión ya paró hace rato",
+  "esperado_riesgo_vital": false,
+  "debe_activar_regla": false,
+  "tipo": "resuelto",
+  "justificacion": "GEN-000 3.5: el sangrado cedió"
+ },
+ {
+  "id": 79,
+  "categoria": "Salud",
+  "subcategoria": "Lesiones / Accidentes",
+  "mensaje": "Se cayó en la escalera",
+  "esperado_riesgo_vital": false,
+  "debe_activar_regla": false,
+  "tipo": "ambiguo",
+  "justificacion": "GEN-000 3.5: 'se cayó' sin señal concreta"
+ },
+ {
+  "id": 80,
+  "categoria": "Salud",
+  "subcategoria": "Lesiones / Accidentes",
+  "mensaje": "sí, se le está empapando todo y no para",
+  "esperado_riesgo_vital": true,
+  "debe_activar_regla": false,
+  "tipo": "multiturno",
+  "justificacion": "Responde que el sangrado no se detiene",
+  "historial_previo": [
+   {
+    "rol": "bot",
+    "texto": "Hola, soy el asistente de ORION. ¿Qué está pasando ahora?"
+   },
+   {
+    "rol": "usuario",
+    "texto": "Se cortó con una galletera en el taller"
+   },
+   {
+    "rol": "bot",
+    "texto": "Presiona firme sobre la herida con una tela limpia, sin retirarla. ¿Sigue sangrando mucho?"
+   }
+  ]
+ },
+ {
+  "id": 81,
+  "categoria": "Salud",
+  "subcategoria": "Salud Mental / Emocional",
+  "mensaje": "Ya no quiero seguir viviendo, tengo todo planeado para hoy",
+  "esperado_riesgo_vital": true,
+  "debe_activar_regla": false,
+  "tipo": "coloquial",
+  "justificacion": "SAL-004 7: intención de quitarse la vida con plan inmediato"
+ },
+ {
+  "id": 82,
+  "categoria": "Salud",
+  "subcategoria": "Salud Mental / Emocional",
+  "mensaje": "Mi amigo está en el borde de la azotea y no se quiere bajar",
+  "esperado_riesgo_vital": true,
+  "debe_activar_regla": false,
+  "tipo": "sin_palabra_clave",
+  "justificacion": "SAL-004 7: exposición deliberada a altura"
+ },
+ {
+  "id": 83,
+  "categoria": "Salud",
+  "subcategoria": "Salud Mental / Emocional",
+  "mensaje": "Se tomó una caja entera de clonazepam hace media hora",
+  "esperado_riesgo_vital": true,
+  "debe_activar_regla": false,
+  "tipo": "sin_palabra_clave",
+  "justificacion": "SAL-004 7: intento con medicamentos en exceso"
+ },
+ {
+  "id": 84,
+  "categoria": "Salud",
+  "subcategoria": "Salud Mental / Emocional",
+  "mensaje": "Se cortó los brazos con una cuchilla y está sangrando",
+  "esperado_riesgo_vital": true,
+  "debe_activar_regla": false,
+  "tipo": "directo",
+  "justificacion": "SAL-004 7: autolesión realizada"
+ },
+ {
+  "id": 85,
+  "categoria": "Salud",
+  "subcategoria": "Salud Mental / Emocional",
+  "mensaje": "Está teniendo una crisis de pánico, respira rápido pero me habla",
+  "esperado_riesgo_vital": false,
+  "debe_activar_regla": false,
+  "tipo": "directo",
+  "justificacion": "SAL-004: crisis sin señales de riesgo vital"
+ },
+ {
+  "id": 86,
+  "categoria": "Salud",
+  "subcategoria": "Salud Mental / Emocional",
+  "mensaje": "Mi compañera está muy angustiada por las notas, llora y tiembla",
+  "esperado_riesgo_vital": false,
+  "debe_activar_regla": false,
+  "tipo": "directo",
+  "justificacion": "SAL-004: crisis emocional sin riesgo vital"
+ },
+ {
+  "id": 87,
+  "categoria": "Salud",
+  "subcategoria": "Salud Mental / Emocional",
+  "mensaje": "Me quiero morir de la vergüenza, me caí delante de todo el curso",
+  "esperado_riesgo_vital": false,
+  "debe_activar_regla": false,
+  "tipo": "falsa_alarma",
+  "justificacion": "Expresión coloquial sin intención real"
+ },
+ {
+  "id": 88,
+  "categoria": "Salud",
+  "subcategoria": "Salud Mental / Emocional",
+  "mensaje": "Dice que va a matar al profesor y tiene un cuchillo en la mochila",
+  "esperado_riesgo_vital": true,
+  "debe_activar_regla": false,
+  "tipo": "sin_palabra_clave",
+  "justificacion": "SAL-004 7: intención de dañar a otro con medio disponible"
+ },
+ {
+  "id": 89,
+  "categoria": "Salud",
+  "subcategoria": "Salud Mental / Emocional",
+  "mensaje": "sí, y tiene las pastillas en la mano",
+  "esperado_riesgo_vital": true,
+  "debe_activar_regla": false,
+  "tipo": "multiturno",
+  "justificacion": "Confirma intención con medio disponible",
+  "historial_previo": [
+   {
+    "rol": "bot",
+    "texto": "Hola, soy el asistente de ORION. ¿Qué está pasando ahora?"
+   },
+   {
+    "rol": "usuario",
+    "texto": "Mi amiga está muy mal, dice cosas raras"
+   },
+   {
+    "rol": "bot",
+    "texto": "Quédate con ella y háblale con calma. ¿Ha dicho que quiere hacerse daño?"
+   }
+  ]
+ },
+ {
+  "id": 90,
+  "categoria": "Infraestructura",
+  "subcategoria": "Incendio / Explosión",
+  "mensaje": "Se está quemando el tercer piso y hay gente arriba que no puede bajar",
+  "esperado_riesgo_vital": true,
+  "debe_activar_regla": false,
+  "tipo": "directo",
+  "justificacion": "INF-001 7: personas que no logran salir"
+ },
+ {
+  "id": 91,
+  "categoria": "Infraestructura",
+  "subcategoria": "Incendio / Explosión",
+  "mensaje": "El pasillo está lleno de humo negro, no se ve nada y hay compañeros adentro",
+  "esperado_riesgo_vital": true,
+  "debe_activar_regla": false,
+  "tipo": "sin_palabra_clave",
+  "justificacion": "INF-001 7: humo denso con personas en la zona"
+ },
+ {
+  "id": 92,
+  "categoria": "Infraestructura",
+  "subcategoria": "Incendio / Explosión",
+  "mensaje": "Huele demasiado a gas en todo el edificio y varios están mareados",
+  "esperado_riesgo_vital": true,
+  "debe_activar_regla": false,
+  "tipo": "sin_palabra_clave",
+  "justificacion": "INF-001 7 / INF-002 7: gas con personas mareadas"
+ },
+ {
+  "id": 93,
+  "categoria": "Infraestructura",
+  "subcategoria": "Incendio / Explosión",
+  "mensaje": "Se escuchó una explosión en el laboratorio de química",
+  "esperado_riesgo_vital": true,
+  "debe_activar_regla": false,
+  "tipo": "directo",
+  "justificacion": "INF-001 7: estallido ocurrido"
+ },
+ {
+  "id": 94,
+  "categoria": "Infraestructura",
+  "subcategoria": "Incendio / Explosión",
+  "mensaje": "A un compañero se le prendió la ropa con el mechero",
+  "esperado_riesgo_vital": true,
+  "debe_activar_regla": false,
+  "tipo": "sin_palabra_clave",
+  "justificacion": "INF-001 7: ropa en llamas"
+ },
+ {
+  "id": 95,
+  "categoria": "Infraestructura",
+  "subcategoria": "Incendio / Explosión",
+  "mensaje": "Se quemó una tostada en el microondas y salió humo, ya ventilamos",
+  "esperado_riesgo_vital": false,
+  "debe_activar_regla": false,
+  "tipo": "coloquial",
+  "justificacion": "Sin amenaza; ya controlado"
+ },
+ {
+  "id": 96,
+  "categoria": "Infraestructura",
+  "subcategoria": "Incendio / Explosión",
+  "mensaje": "Hay olor a quemado en la sala, pero no hay humo ni fuego visible",
+  "esperado_riesgo_vital": false,
+  "debe_activar_regla": false,
+  "tipo": "negacion",
+  "justificacion": "Sin señal concreta"
+ },
+ {
+  "id": 97,
+  "categoria": "Infraestructura",
+  "subcategoria": "Incendio / Explosión",
+  "mensaje": "Hubo un amago de incendio en la cocina, ya lo apagaron con el extintor y estamos todos afuera",
+  "esperado_riesgo_vital": false,
+  "debe_activar_regla": false,
+  "tipo": "resuelto",
+  "justificacion": "GEN-000 3.5: ya salieron todos"
+ },
+ {
+  "id": 98,
+  "categoria": "Infraestructura",
+  "subcategoria": "Incendio / Explosión",
+  "mensaje": "La bomba de incendio del edificio está goteando",
+  "esperado_riesgo_vital": false,
+  "debe_activar_regla": false,
+  "tipo": "falsa_alarma",
+  "justificacion": "Falsa alarma por la palabra 'bomba'"
+ },
+ {
+  "id": 99,
+  "categoria": "Infraestructura",
+  "subcategoria": "Servicios Básicos",
+  "mensaje": "Se cortó el agua en todo el campus",
+  "esperado_riesgo_vital": false,
+  "debe_activar_regla": false,
+  "tipo": "directo",
+  "justificacion": "INF-002: corte sin personas en peligro"
+ },
+ {
+  "id": 100,
+  "categoria": "Infraestructura",
+  "subcategoria": "Servicios Básicos",
+  "mensaje": "Hay un cable cortado tirando chispas en el patio, lo tengo acordonado",
+  "esperado_riesgo_vital": false,
+  "debe_activar_regla": false,
+  "tipo": "directo",
+  "justificacion": "INF-002: peligro sin personas expuestas"
+ },
+ {
+  "id": 101,
+  "categoria": "Infraestructura",
+  "subcategoria": "Servicios Básicos",
+  "mensaje": "Un alumno tocó el enchufe mojado y quedó tirado temblando",
+  "esperado_riesgo_vital": true,
+  "debe_activar_regla": false,
+  "tipo": "sin_palabra_clave",
+  "justificacion": "INF-002 7: descarga eléctrica"
+ },
+ {
+  "id": 102,
+  "categoria": "Infraestructura",
+  "subcategoria": "Servicios Básicos",
+  "mensaje": "Hay gente atrapada en el ascensor, están tranquilos",
+  "esperado_riesgo_vital": false,
+  "debe_activar_regla": false,
+  "tipo": "directo",
+  "justificacion": "INF-002: atrapados sin peligro inmediato"
+ },
+ {
+  "id": 103,
+  "categoria": "Infraestructura",
+  "subcategoria": "Servicios Básicos",
+  "mensaje": "Quedaron atrapados en el subterráneo y el agua está subiendo rápido",
+  "esperado_riesgo_vital": true,
+  "debe_activar_regla": false,
+  "tipo": "sin_palabra_clave",
+  "justificacion": "INF-002 7: atrapados con agua subiendo"
+ },
+ {
+  "id": 104,
+  "categoria": "Infraestructura",
+  "subcategoria": "Servicios Básicos",
+  "mensaje": "Se fue la luz, nadie se quedó encerrado ni hay heridos",
+  "esperado_riesgo_vital": false,
+  "debe_activar_regla": false,
+  "tipo": "negacion",
+  "justificacion": "Sin señales"
+ },
+ {
+  "id": 105,
+  "categoria": "Infraestructura",
+  "subcategoria": "Servicios Básicos",
+  "mensaje": "Hay olor a gas en el casino, sacamos a todos y nadie se siente mal",
+  "esperado_riesgo_vital": false,
+  "debe_activar_regla": false,
+  "tipo": "par",
+  "justificacion": "Par: gas sin síntomas, evacuado"
+ },
+ {
+  "id": 106,
+  "categoria": "Infraestructura",
+  "subcategoria": "Servicios Básicos",
+  "mensaje": "Hay olor a gas en el casino y una señora se desmayó",
+  "esperado_riesgo_vital": true,
+  "debe_activar_regla": false,
+  "tipo": "par",
+  "justificacion": "INF-002 7: gas con persona desmayada"
+ },
+ {
+  "id": 107,
+  "categoria": "Infraestructura",
+  "subcategoria": "Riesgo Estructural",
+  "mensaje": "Se está cayendo el muro del estacionamiento y hay autos con gente al lado",
+  "esperado_riesgo_vital": true,
+  "debe_activar_regla": false,
+  "tipo": "directo",
+  "justificacion": "INF-003 7: caída inminente con personas cerca"
+ },
+ {
+  "id": 108,
+  "categoria": "Infraestructura",
+  "subcategoria": "Riesgo Estructural",
+  "mensaje": "El techo de la sala está crujiendo y cediendo, todavía hay alumnos dentro",
+  "esperado_riesgo_vital": true,
+  "debe_activar_regla": false,
+  "tipo": "sin_palabra_clave",
+  "justificacion": "INF-003 7: movimiento visible con personas cerca"
+ },
+ {
+  "id": 109,
+  "categoria": "Infraestructura",
+  "subcategoria": "Riesgo Estructural",
+  "mensaje": "Se cayó un pedazo de cielo falso en el pasillo, no había nadie",
+  "esperado_riesgo_vital": false,
+  "debe_activar_regla": false,
+  "tipo": "directo",
+  "justificacion": "INF-003: daño sin personas expuestas"
+ },
+ {
+  "id": 110,
+  "categoria": "Infraestructura",
+  "subcategoria": "Riesgo Estructural",
+  "mensaje": "Hay una filtración y se está manchando el techo",
+  "esperado_riesgo_vital": false,
+  "debe_activar_regla": false,
+  "tipo": "directo",
+  "justificacion": "Sin amenaza"
+ },
+ {
+  "id": 111,
+  "categoria": "Infraestructura",
+  "subcategoria": "Riesgo Estructural",
+  "mensaje": "Se desprendió una cornisa y le cayó a un trabajador",
+  "esperado_riesgo_vital": true,
+  "debe_activar_regla": false,
+  "tipo": "sin_palabra_clave",
+  "justificacion": "INF-003 7: persona herida por desprendimiento"
+ },
+ {
+  "id": 112,
+  "categoria": "Infraestructura",
+  "subcategoria": "Riesgo Estructural",
+  "mensaje": "Apareció una grieta nueva en la pared del aula",
+  "esperado_riesgo_vital": false,
+  "debe_activar_regla": false,
+  "tipo": "ambiguo",
+  "justificacion": "Sin señal concreta; preguntar si hay personas cerca y si empeora"
+ },
+ {
+  "id": 113,
+  "categoria": "Infraestructura",
+  "subcategoria": "Evacuación / Desastre Natural",
+  "mensaje": "Está temblando muy fuerte",
+  "esperado_riesgo_vital": false,
+  "debe_activar_regla": false,
+  "tipo": "directo",
+  "justificacion": "GEN-000 3.5: 'tembló' sin señal concreta"
+ },
+ {
+  "id": 114,
+  "categoria": "Infraestructura",
+  "subcategoria": "Evacuación / Desastre Natural",
+  "mensaje": "Después del terremoto quedó gente bajo el muro que se cayó",
+  "esperado_riesgo_vital": true,
+  "debe_activar_regla": false,
+  "tipo": "sin_palabra_clave",
+  "justificacion": "INF-004 7: personas atrapadas por colapso"
+ },
+ {
+  "id": 115,
+  "categoria": "Infraestructura",
+  "subcategoria": "Evacuación / Desastre Natural",
+  "mensaje": "Sonó la alerta de tsunami y hay alumnos que siguen en la playa del campus",
+  "esperado_riesgo_vital": true,
+  "debe_activar_regla": false,
+  "tipo": "sin_palabra_clave",
+  "justificacion": "INF-004 7: alerta de tsunami con personas sin evacuar"
+ },
+ {
+  "id": 116,
+  "categoria": "Infraestructura",
+  "subcategoria": "Evacuación / Desastre Natural",
+  "mensaje": "Estamos evacuando por el simulacro, todo normal",
+  "esperado_riesgo_vital": false,
+  "debe_activar_regla": false,
+  "tipo": "directo",
+  "justificacion": "Simulacro sin amenaza"
+ },
+ {
+  "id": 117,
+  "categoria": "Infraestructura",
+  "subcategoria": "Evacuación / Desastre Natural",
+  "mensaje": "Una profesora con muletas no pudo bajar del cuarto piso y el edificio quedó dañado",
+  "esperado_riesgo_vital": true,
+  "debe_activar_regla": false,
+  "tipo": "sin_palabra_clave",
+  "justificacion": "INF-004 7: movilidad reducida dentro de edificio dañado"
+ },
+ {
+  "id": 118,
+  "categoria": "Infraestructura",
+  "subcategoria": "Evacuación / Desastre Natural",
+  "mensaje": "Fue un temblor fuerte, salimos todos y nadie está herido",
+  "esperado_riesgo_vital": false,
+  "debe_activar_regla": false,
+  "tipo": "negacion",
+  "justificacion": "GEN-000 3.5: descarta las señales"
+ },
+ {
+  "id": 119,
+  "categoria": "Seguridad",
+  "subcategoria": "Violencia interpersonal",
+  "mensaje": "Le están sacando la mugre a un cabro en el suelo, le pegan patadas en la cabeza",
+  "esperado_riesgo_vital": true,
+  "debe_activar_regla": false,
+  "tipo": "coloquial",
+  "justificacion": "SEG-001 7: golpes repetidos a persona caída en la cabeza"
+ },
+ {
+  "id": 120,
+  "categoria": "Seguridad",
+  "subcategoria": "Violencia interpersonal",
+  "mensaje": "Creo que uno tiene un cuchillo, no estoy seguro",
+  "esperado_riesgo_vital": true,
+  "debe_activar_regla": false,
+  "tipo": "duda",
+  "justificacion": "GEN-000 3.4: señal descrita con duda cuenta"
+ },
+ {
+  "id": 121,
+  "categoria": "Seguridad",
+  "subcategoria": "Violencia interpersonal",
+  "mensaje": "Lo tiene agarrado del cuello y lo está ahorcando",
+  "esperado_riesgo_vital": true,
+  "debe_activar_regla": false,
+  "tipo": "sin_palabra_clave",
+  "justificacion": "SEG-001 7: estrangulamiento"
+ },
+ {
+  "id": 122,
+  "categoria": "Seguridad",
+  "subcategoria": "Violencia interpersonal",
+  "mensaje": "Dos alumnos se están gritando y empujando en el patio",
+  "esperado_riesgo_vital": false,
+  "debe_activar_regla": false,
+  "tipo": "directo",
+  "justificacion": "GEN-000 3.5: pelea sin señal concreta"
+ },
+ {
+  "id": 123,
+  "categoria": "Seguridad",
+  "subcategoria": "Violencia interpersonal",
+  "mensaje": "Me pegaron un combo en la cara, me duele pero estoy bien",
+  "esperado_riesgo_vital": false,
+  "debe_activar_regla": false,
+  "tipo": "directo",
+  "justificacion": "SEG-001: agresión sin riesgo vital"
+ },
+ {
+  "id": 124,
+  "categoria": "Seguridad",
+  "subcategoria": "Violencia interpersonal",
+  "mensaje": "Le pegaron con un fierro en la cabeza y está en el suelo sin moverse",
+  "esperado_riesgo_vital": true,
+  "debe_activar_regla": false,
+  "tipo": "sin_palabra_clave",
+  "justificacion": "SEG-001 7: golpe con objeto y persona que no responde"
+ },
+ {
+  "id": 125,
+  "categoria": "Seguridad",
+  "subcategoria": "Violencia interpersonal",
+  "mensaje": "Hubo una pelea pero ya se separaron, no hay armas y nadie quedó herido",
+  "esperado_riesgo_vital": false,
+  "debe_activar_regla": false,
+  "tipo": "negacion",
+  "justificacion": "GEN-000 3.5"
+ },
+ {
+  "id": 126,
+  "categoria": "Seguridad",
+  "subcategoria": "Violencia interpersonal",
+  "mensaje": "sí, sacó una cortapluma",
+  "esperado_riesgo_vital": true,
+  "debe_activar_regla": false,
+  "tipo": "multiturno",
+  "justificacion": "Confirma arma ante la pregunta del bot",
+  "historial_previo": [
+   {
+    "rol": "bot",
+    "texto": "Hola, soy el asistente de ORION. ¿Qué está pasando ahora?"
+   },
+   {
+    "rol": "usuario",
+    "texto": "Hay una pelea en la entrada del edificio B"
+   },
+   {
+    "rol": "bot",
+    "texto": "Aléjate a un lugar seguro y no intentes separarlos. ¿Hay armas u objetos que estén usando para agredir?"
+   }
+  ]
+ },
+ {
+  "id": 127,
+  "categoria": "Seguridad",
+  "subcategoria": "Violencia interpersonal",
+  "mensaje": "no, solo combos, ya se están calmando",
+  "esperado_riesgo_vital": false,
+  "debe_activar_regla": false,
+  "tipo": "multiturno",
+  "justificacion": "Descarta armas y heridos",
+  "historial_previo": [
+   {
+    "rol": "bot",
+    "texto": "Hola, soy el asistente de ORION. ¿Qué está pasando ahora?"
+   },
+   {
+    "rol": "usuario",
+    "texto": "Hay una pelea en la entrada del edificio B"
+   },
+   {
+    "rol": "bot",
+    "texto": "Aléjate a un lugar seguro y no intentes separarlos. ¿Hay armas u objetos que estén usando para agredir?"
+   }
+  ]
+ },
+ {
+  "id": 128,
+  "categoria": "Seguridad",
+  "subcategoria": "Amenazas críticas",
+  "mensaje": "Un loco anda con una pistola en el hall gritando",
+  "esperado_riesgo_vital": true,
+  "debe_activar_regla": true,
+  "tipo": "coloquial",
+  "justificacion": "SEG-002 7: persona armada dentro de las instalaciones"
+ },
+ {
+  "id": 129,
+  "categoria": "Seguridad",
+  "subcategoria": "Amenazas críticas",
+  "mensaje": "Se escucharon como tres balazos cerca de la biblioteca",
+  "esperado_riesgo_vital": true,
+  "debe_activar_regla": true,
+  "tipo": "sin_palabra_clave",
+  "justificacion": "SEG-002 7: disparos escuchados"
+ },
+ {
+  "id": 130,
+  "categoria": "Seguridad",
+  "subcategoria": "Amenazas críticas",
+  "mensaje": "Publicaron en Instagram que hoy a las 12 van a entrar a matar gente a la sede",
+  "esperado_riesgo_vital": true,
+  "debe_activar_regla": false,
+  "tipo": "sin_palabra_clave",
+  "justificacion": "SEG-002 7: aviso de ataque inminente"
+ },
+ {
+  "id": 131,
+  "categoria": "Seguridad",
+  "subcategoria": "Amenazas críticas",
+  "mensaje": "Encontramos el paquete que describía el correo de amenaza, con cables a la vista",
+  "esperado_riesgo_vital": true,
+  "debe_activar_regla": false,
+  "tipo": "sin_palabra_clave",
+  "justificacion": "SEG-002 7: objeto que coincide con la amenaza"
+ },
+ {
+  "id": 132,
+  "categoria": "Seguridad",
+  "subcategoria": "Amenazas críticas",
+  "mensaje": "Alguien escribió una amenaza en el baño pero sin fecha ni nada",
+  "esperado_riesgo_vital": false,
+  "debe_activar_regla": false,
+  "tipo": "directo",
+  "justificacion": "Amenaza difusa sin señal de inminencia; preguntar y orientar SEG-002"
+ },
+ {
+  "id": 133,
+  "categoria": "Seguridad",
+  "subcategoria": "Amenazas críticas",
+  "mensaje": "Explotó una bolsa de papas en clases y todos se asustaron",
+  "esperado_riesgo_vital": false,
+  "debe_activar_regla": false,
+  "tipo": "falsa_alarma",
+  "justificacion": "Falsa alarma"
+ },
+ {
+  "id": 134,
+  "categoria": "Seguridad",
+  "subcategoria": "Amenazas críticas",
+  "mensaje": "Están celebrando con fuegos artificiales afuera",
+  "esperado_riesgo_vital": false,
+  "debe_activar_regla": false,
+  "tipo": "falsa_alarma",
+  "justificacion": "Ruido sin amenaza"
+ },
+ {
+  "id": 135,
+  "categoria": "Seguridad",
+  "subcategoria": "Delitos / conductas ilícitas",
+  "mensaje": "Me abrieron el casillero y se llevaron mis cosas",
+  "esperado_riesgo_vital": false,
+  "debe_activar_regla": false,
+  "tipo": "directo",
+  "justificacion": "GEN-000 3.5: 'me robaron' sin señal"
+ },
+ {
+  "id": 136,
+  "categoria": "Seguridad",
+  "subcategoria": "Delitos / conductas ilícitas",
+  "mensaje": "Me asaltaron con un cuchillo en el estacionamiento y se fueron",
+  "esperado_riesgo_vital": true,
+  "debe_activar_regla": false,
+  "tipo": "sin_palabra_clave",
+  "justificacion": "SEG-003 7: robo con arma"
+ },
+ {
+  "id": 137,
+  "categoria": "Seguridad",
+  "subcategoria": "Delitos / conductas ilícitas",
+  "mensaje": "Hay un alumno que se metió algo en el baño, está tirado y respira muy lento",
+  "esperado_riesgo_vital": true,
+  "debe_activar_regla": false,
+  "tipo": "sin_palabra_clave",
+  "justificacion": "SEG-003 7: intoxicación con dificultad respiratoria"
+ },
+ {
+  "id": 138,
+  "categoria": "Seguridad",
+  "subcategoria": "Delitos / conductas ilícitas",
+  "mensaje": "Rayaron mi auto en el estacionamiento",
+  "esperado_riesgo_vital": false,
+  "debe_activar_regla": false,
+  "tipo": "directo",
+  "justificacion": "Daño a la propiedad sin riesgo"
+ },
+ {
+  "id": 139,
+  "categoria": "Seguridad",
+  "subcategoria": "Delitos / conductas ilícitas",
+  "mensaje": "Le robaron el celular y lo apuñalaron en la pierna, sangra harto",
+  "esperado_riesgo_vital": true,
+  "debe_activar_regla": true,
+  "tipo": "sin_palabra_clave",
+  "justificacion": "SEG-003 7: persona herida de gravedad durante el hecho"
+ },
+ {
+  "id": 140,
+  "categoria": "Seguridad",
+  "subcategoria": "Orden público / sospecha",
+  "mensaje": "Hay una protesta en la entrada con lienzos, todo pacífico",
+  "esperado_riesgo_vital": false,
+  "debe_activar_regla": false,
+  "tipo": "directo",
+  "justificacion": "SEG-004 sin escalada"
+ },
+ {
+  "id": 141,
+  "categoria": "Seguridad",
+  "subcategoria": "Orden público / sospecha",
+  "mensaje": "Hay un auto estacionado hace horas con alguien adentro mirando",
+  "esperado_riesgo_vital": false,
+  "debe_activar_regla": false,
+  "tipo": "directo",
+  "justificacion": "Sospecha sin amenaza"
+ },
+ {
+  "id": 142,
+  "categoria": "Seguridad",
+  "subcategoria": "Orden público / sospecha",
+  "mensaje": "La protesta se puso violenta y están tirando piedras a la gente, hay un herido en el suelo que no responde",
+  "esperado_riesgo_vital": true,
+  "debe_activar_regla": true,
+  "tipo": "sin_palabra_clave",
+  "justificacion": "SEG-004 7: escala a agresión grave"
+ },
+ {
+  "id": 143,
+  "categoria": "Seguridad",
+  "subcategoria": "Orden público / sospecha",
+  "mensaje": "Hay un tipo raro en el pasillo, pero ya se fue",
+  "esperado_riesgo_vital": false,
+  "debe_activar_regla": false,
+  "tipo": "falsa_alarma",
+  "justificacion": "Sospecha resuelta"
+ },
+ {
+  "id": 144,
+  "categoria": "Seguridad",
+  "subcategoria": "Orden público / sospecha",
+  "mensaje": "ahora el tipo sacó una pistola",
+  "esperado_riesgo_vital": true,
+  "debe_activar_regla": true,
+  "tipo": "multiturno",
+  "justificacion": "La situación escala a amenaza con arma",
+  "historial_previo": [
+   {
+    "rol": "bot",
+    "texto": "Hola, soy el asistente de ORION. ¿Qué está pasando ahora?"
+   },
+   {
+    "rol": "usuario",
+    "texto": "Hay un hombre merodeando los autos hace rato"
+   },
+   {
+    "rol": "bot",
+    "texto": "Mantén distancia y no te acerques. ¿Sigue en el lugar?"
+   },
+   {
+    "rol": "usuario",
+    "texto": "sí, está mirando para adentro de los autos"
+   },
+   {
+    "rol": "bot",
+    "texto": "Mantén distancia y anota detalles desde lejos. Avísame si la conducta cambia o se vuelve amenazante."
+   }
+  ]
+ },
+ {
+  "id": 145,
+  "categoria": "Salud",
+  "subcategoria": "Lesiones / Accidentes",
+  "mensaje": "Se cortó un dedo con la sierra del taller, se lo amputó",
+  "esperado_riesgo_vital": true,
+  "debe_activar_regla": false,
+  "tipo": "secuela_grave",
+  "justificacion": "D.S. 34/2022 art. 4: riesgo de secuela grave (pérdida de una parte del cuerpo)"
+ },
+ {
+  "id": 146,
+  "categoria": "Salud",
+  "subcategoria": "Lesiones / Accidentes",
+  "mensaje": "Le saltó cloro a los ojos y no los puede abrir",
+  "esperado_riesgo_vital": true,
+  "debe_activar_regla": false,
+  "tipo": "secuela_grave",
+  "justificacion": "D.S. 34/2022 art. 4: riesgo de secuela grave (químico en un ojo)"
+ },
+ {
+  "id": 147,
+  "categoria": "Salud",
+  "subcategoria": "Lesiones / Accidentes",
+  "mensaje": "Se cayó y se le ve el hueso de la pierna",
+  "esperado_riesgo_vital": true,
+  "debe_activar_regla": false,
+  "tipo": "secuela_grave",
+  "justificacion": "D.S. 34/2022 art. 4: riesgo de secuela grave (fractura expuesta)"
+ },
+ {
+  "id": 148,
+  "categoria": "Salud",
+  "subcategoria": "Lesiones / Accidentes",
+  "mensaje": "Le cayó una puerta metálica en la mano y ahora tiene los dedos fríos y morados, no los siente",
+  "esperado_riesgo_vital": true,
+  "debe_activar_regla": false,
+  "tipo": "secuela_grave",
+  "justificacion": "D.S. 34/2022 art. 4: riesgo de secuela grave (extremidad sin circulación ni sensibilidad)"
+ },
+ {
+  "id": 149,
+  "categoria": "Salud",
+  "subcategoria": "Lesiones / Accidentes",
+  "mensaje": "Se le clavó una astilla de metal en el ojo en el taller",
+  "esperado_riesgo_vital": true,
+  "debe_activar_regla": false,
+  "tipo": "secuela_grave",
+  "justificacion": "D.S. 34/2022 art. 4: riesgo de secuela grave (cuerpo extraño en un ojo)"
+ },
+ {
+  "id": 150,
+  "categoria": "Salud",
+  "subcategoria": "Urgencia",
+  "mensaje": "De repente dejó de ver por un ojo",
+  "esperado_riesgo_vital": true,
+  "debe_activar_regla": false,
+  "tipo": "secuela_grave",
+  "justificacion": "D.S. 34/2022 art. 4: riesgo de secuela grave (pérdida súbita de la visión)"
+ },
+ {
+  "id": 151,
+  "categoria": "Salud",
+  "subcategoria": "Lesiones / Accidentes",
+  "mensaje": "Se dobló el dedo jugando vóley, está hinchado pero lo mueve bien",
+  "esperado_riesgo_vital": false,
+  "debe_activar_regla": false,
+  "tipo": "secuela_grave",
+  "justificacion": "Lesión sin falla grave ni pérdida de la función: no es secuela grave"
+ },
+ {
+  "id": 152,
+  "categoria": "Salud",
+  "subcategoria": "Lesiones / Accidentes",
+  "mensaje": "Le entró jabón al ojo, ya se lavó y ve bien",
+  "esperado_riesgo_vital": false,
+  "debe_activar_regla": false,
+  "tipo": "secuela_grave",
+  "justificacion": "La función del ojo está conservada: no es secuela grave"
+ }
+]

@@ -12,7 +12,10 @@ cada llamada. Los protocolos están en `docs/protocolos_completos.txt` dentro de
 src/app.py        API (GET /health, POST /v1/chat, POST /v1/resumen)
 src/rag.py        índice local + búsqueda + respuesta y resumen con Nova (Converse)
 src/riesgo.py     red de seguridad determinística de riesgo vital
-src/evaluar_riesgo_vital.py  evaluación con Bedrock real sobre docs/casos_riesgo_vital.json
+src/evaluar_riesgo_vital.py  evaluación de riesgo vital sobre docs/casos_riesgo_vital.json (recall, matriz de confusión)
+src/evaluar_orientacion.py   evaluación de la orientación con docs/escenarios_orientacion.json y un LLM juez
+src/orientacion.py           rúbrica, chequeos automáticos y juez · src/metricas.py  métricas e intervalos
+src/acuerdo_juez.py          compara el juez con tu revisión manual
 src/preguntar.py  prueba por consola sin API
 tests/test_api.py pruebas del contrato con Bedrock simulado
 aws/iam-policy-chatbot.json  política para el rol IAM de la EC2
@@ -106,8 +109,8 @@ Cuando cambien los protocolos basta con `docker compose up -d --build`: el índi
 pip install -r src/requirements.txt pytest httpx
 python -m pytest -q tests
 
-# En la EC2: evaluación de riesgo vital con Bedrock real (debe terminar con FN 0)
-docker compose run --rm chatbot python evaluar_riesgo_vital.py
+# En la EC2: evaluación de riesgo vital con Bedrock real (ver "Evaluación del chatbot")
+docker compose run --rm -v "$PWD/resultados:/tmp/resultados" chatbot python evaluar_riesgo_vital.py --salida /tmp/resultados
 
 # En la EC2, desde la red interna (como lo hace NestJS)
 TOKEN=$(grep ^INTERNAL_TOKEN .env | cut -d= -f2)
@@ -121,3 +124,56 @@ docker run --rm --network orion-network curlimages/curl -s -X POST http://chatbo
 ```
 Desde tu PC, `http://<IP-EC2>:8000/health` debe **fallar** (el puerto no se publica).
 Para probar solo el contrato sin AWS: `CHATBOT_MODO=eco` en `.env`.
+
+## Evaluación del chatbot
+
+Dos evaluaciones separadas, porque miden cosas distintas. Las dos dejan un `reporte.md` con tablas listas para la
+tesis en `resultados/<tipo>_<fecha>/`. Ninguna se corre en los tests: usan Bedrock real y cuestan dinero.
+
+### 1. Detección de riesgo vital (`evaluar_riesgo_vital.py`)
+
+`docs/casos_riesgo_vital.json` tiene 144 frases etiquetadas (79 con riesgo vital y 65 sin), con un `tipo`
+(coloquial, sin palabra clave, negación, ya resuelto, falsa alarma, par casi igual, multi-turno…) y la
+justificación de cada etiqueta según GEN-000 o el protocolo. Los casos `multiturno` traen `historial_previo`:
+el riesgo aparece en la respuesta del usuario a una pregunta del bot ("¿respira?" → "no").
+
+```bash
+python evaluar_riesgo_vital.py --solo-reglas      # solo riesgo.py: gratis, sin AWS
+python evaluar_riesgo_vital.py                    # Bedrock real, 5 repeticiones por frase (~720 llamadas)
+python evaluar_riesgo_vital.py -n 3 --tipo multiturno
+```
+Reporta tres capas por separado (solo reglas, solo modelo y sistema completo), con recall e intervalo de
+confianza de Wilson, precisión, especificidad y F2. Agrega el **peor caso** (una frase grave cuenta como detectada
+solo si se detectó en todas las repeticiones), la **estabilidad** entre repeticiones, y el desglose por tipo y
+subcategoría. El error que importa es el **falso negativo**: termina con código 1 si hay alguno en el peor caso.
+
+### 2. Calidad de la orientación (`evaluar_orientacion.py`)
+
+`docs/escenarios_orientacion.json` tiene 29 conversaciones guionadas (46 turnos) que cubren los 12 protocolos.
+Cada turno trae el mensaje del usuario, el `riesgo_vital` esperado y listas `debe` / `no_debe` sacadas del
+protocolo. El bot responde de verdad y su respuesta entra al historial del turno siguiente.
+
+Cada respuesta se evalúa con:
+- **Chequeos automáticos** (código): riesgo_vital del turno, máximo 4 oraciones y 2 preguntas, aviso en la primera
+  respuesta, sin números externos y sin prometer llegadas ni tiempos.
+- **LLM juez** (Claude en Bedrock, `JUEZ_MODEL`, por defecto `anthropic.claude-opus-5-5`): recibe GEN-000, el
+  protocolo esperado y la conversación, y marca cada criterio como cumple / no cumple con una cita de la respuesta.
+  Criterios generales: seguridad, fidelidad al protocolo, prioridad, no repetir preguntas y tono; más los `debe` y
+  `no_debe` del turno. Seguridad y `no_debe` son críticos: si fallan, el escenario no se aprueba.
+
+```bash
+pip install -r src/requirements-eval.txt
+cd src
+python evaluar_orientacion.py --sin-juez -n 1                 # primero, sin costo del juez
+python evaluar_orientacion.py                                 # 3 repeticiones con juez
+python evaluar_orientacion.py --desde ../resultados/orientacion_<fecha>   # re-juzga sin volver a llamar al bot
+```
+
+**Validar al juez**: cada corrida deja `revision_manual.csv` con una muestra de conversaciones. Completa la columna
+`veredicto_humano` con "si" o "no" según tu criterio y corre `python acuerdo_juez.py <ruta del csv>`. Con un
+acuerdo de 85-90% o más y kappa sobre 0.6 el juez es confiable para el resto.
+
+**Dónde correrlo**: el juez usa el SDK de Anthropic (no está en la imagen de producción) y necesita acceso a Claude
+en Bedrock (*Model access*), que el rol de la EC2 no tiene. Lo más simple es correr esta evaluación desde tu PC con
+un perfil de AWS que tenga acceso a Nova Lite, Titan Embeddings y Claude (`AWS_PROFILE=... python evaluar_orientacion.py`).
+Si en tu región no está disponible, cambia `JUEZ_REGION` o `JUEZ_MODEL`.
