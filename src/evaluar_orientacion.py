@@ -5,6 +5,7 @@ Uso (desde src/, con credenciales de Bedrock):
   python evaluar_orientacion.py --ids SAL-001 -n 1     # solo los escenarios de SAL-001, una vez
   python evaluar_orientacion.py --sin-juez             # solo chequeos automáticos (sin costo del juez)
   python evaluar_orientacion.py --desde ../resultados/orientacion_2026-11-01_1200   # re-juzga sin volver a llamar al bot
+  python evaluar_orientacion.py --desde <carpeta> --veredictos-juez veredictos_juez.json   # juez externo (Claude en el chat)
 
 Cada escenario son los mensajes del usuario turno a turno; el bot responde de verdad y su respuesta entra al
 historial del turno siguiente, igual que en la app. Después cada turno se evalúa con chequeos deterministas y con
@@ -25,7 +26,8 @@ from datetime import datetime
 from pathlib import Path
 
 from metricas import pct
-from orientacion import JUEZ_MODEL, UMBRAL_APROBACION, chequeos_deterministas, juzgar
+from orientacion import (JUEZ_MODEL, UMBRAL_APROBACION, chequeos_deterministas, criterios_juez, juzgar,
+                         parsear_veredictos)
 
 RAIZ = Path(__file__).resolve().parent.parent
 ESCENARIOS = RAIZ / "docs" / "escenarios_orientacion.json"
@@ -67,6 +69,7 @@ def main() -> int:
     p.add_argument("--ids", help="ids o prefijos separados por coma, por ejemplo SAL-001,SEG-002-01")
     p.add_argument("--sin-juez", action="store_true", help="solo chequeos deterministas")
     p.add_argument("--desde", help="carpeta de una corrida anterior: re-juzga sus conversaciones sin llamar al bot")
+    p.add_argument("--veredictos-juez", help="JSON con los veredictos de un juez externo, en vez de llamar al juez por API")
     p.add_argument("--muestra", type=int, default=30, help="conversaciones para revisión manual del juez")
     p.add_argument("--salida", default=str(RAIZ / "resultados"))
     args = p.parse_args()
@@ -100,11 +103,24 @@ def main() -> int:
         (carpeta / "conversaciones.json").write_text(json.dumps(conversaciones, ensure_ascii=False, indent=1),
                                                     encoding="utf-8")
 
+    externos = None
+    if args.veredictos_juez:
+        # {"SAL-001-01#1": {"veredictos": [{"id", "cumple", "evidencia"}], "comentario": ""}, ...}
+        externos = json.loads(Path(args.veredictos_juez).read_text(encoding="utf-8"))
     filas, comentarios, errores_juez = [], {}, 0
     for conv in conversaciones:
         e, turnos_bot = por_id[conv["escenario"]], conv["turnos_bot"]
         veredictos = chequeos_deterministas(e, turnos_bot, rag.AVISO)
-        if not args.sin_juez:
+        if externos is not None:
+            clave = f"{e['id']}#{conv['repeticion']}"
+            if clave in externos:
+                del_juez, comentario = parsear_veredictos(json.dumps(externos[clave]), criterios_juez(e))
+                veredictos += del_juez
+                comentarios[(e["id"], conv["repeticion"])] = comentario
+            else:
+                errores_juez += 1
+                print(f"  sin veredictos externos para {clave}")
+        elif not args.sin_juez:
             try:
                 del_juez, comentario = juzgar(e, turnos_bot, protocolos[e["protocolo"]], marco)
                 veredictos += del_juez
@@ -158,7 +174,8 @@ def main() -> int:
     r = [f"# Evaluación de la orientación · {fecha}", "",
          f"- Escenarios: {len(por_esc)} · repeticiones: {reps} · conversaciones: {len(por_conv)} · "
          f"turnos evaluados: {len(rv)}",
-         f"- Modelo evaluado: `{LLM_MODEL}` · juez: {'sin juez' if args.sin_juez else f'`{JUEZ_MODEL}`'}"
+         f"- Modelo evaluado: `{LLM_MODEL}` · juez: "
+         f"{f'externo ({Path(args.veredictos_juez).name})' if externos is not None else 'sin juez' if args.sin_juez else f'`{JUEZ_MODEL}`'}"
          f"{f' · el juez falló en {errores_juez} conversaciones' if errores_juez else ''}",
          f"- Un escenario se aprueba con 0 criterios críticos fallidos y al menos {UMBRAL_APROBACION:.0%} del resto cumplido.",
          "", "## Resultado general", "",
