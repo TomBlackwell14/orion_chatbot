@@ -27,7 +27,7 @@ REGLAS: dict[str, str] = {
             r"apunal\w*|acuchill\w*|armad[oa]s?|(?:tiene|tienen|lleva|llevan|porta|saco|muestra|con) (?:un |una )?armas?)\b",
     "explosivo": r"\b(?:bomba(?! de (?:agua|bencina|incendio|calor))|explosivo\w*|artefacto explosivo)\b",
     "autolesion": r"\b(?:suicid\w*|quitarse la vida|quitarme la vida|(?:me|se) quiere matar|me quiero matar|"
-                  r"me quiero morir|se quiere morir|(?:se|me) corto las venas|me corte las venas|"
+                  r"(?:me quiero|se quiere) morir(?! de (?:la )?(?:verguenza|risa|sueno|hambre|calor|frio|ganas))|(?:se|me) corto las venas|me corte las venas|"
                   r"(?:se|me) tomo (?:muchas|todas las) pastillas)\b",
     "atrapado_peligro": r"\batrapad\w* (?:en|por|bajo|entre) (?:el |la |los |las )?"
                         r"(?:fuego|humo|llamas|incendio|escombros|derrumbe)\b",
