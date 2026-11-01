@@ -1,0 +1,4 @@
+-r requirements.txt
+anthropic==2.3.0
+pytest
+httpx
