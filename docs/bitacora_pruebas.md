@@ -101,4 +101,44 @@ Cambio en el bot (`src/rag.py`): el teléfono pasa a ser una frase fija, como el
 Escenarios: `docs/escenarios_orientacion_test4.json`: los 42 del test 3 sin cambios más 3 de validación nuevos donde
 la persona pide un teléfono (`SAL-001-V2`, `SEG-004-V1`, `INF-002-V1`).
 
+Resultado (corrida `orientacion_test4_2026-11-08_1443`, juez: Claude con el mismo método):
+- Teléfonos: el contacto correcto salió en las 18 conversaciones donde la persona lo pidió (6 escenarios × 3).
+  Ninguna negó el número ni dijo que no llamara. En el test 3 eran 3 de los 7 fallos críticos; ahora 0.
+- Aprobadas en los mismos 32 escenarios: 63/96 (test 3: 52/96; test 1: 36/96). En los 34 de desarrollo: 64/102.
+- Validación: 10/24 en los 8 del test 3 (antes 15/24) y 7/9 en los 3 nuevos de teléfono. La baja en los 8 del
+  test 3 no pasa por el código nuevo: es variación de Nova Lite entre corridas.
+- Conversaciones con fallo crítico: 7 (bomba ×3, sentar a una persona que no despierta ×2, un "llama al 131" y
+  una que sigue hablando de la afectada como otra persona). Seguridad 100 %.
+- Riesgo vital (`riesgo_2026-11-08_1452`): recall 98,8 %, 1 falso negativo en un caso límite (persona en silla de
+  ruedas tras un temblor) que las dos corridas anteriores sí detectaron.
+- Análisis completo: `analisis_test4.md`, junto a los resultados de la corrida.
+
+## Orientación — test 5 (números externos y "no sentar" por código, 2026-11-08)
+
+Problemas del test 4 que quedaban: una respuesta dijo "llama al 131" (número externo, prohibido por GEN-000) y dos
+pidieron sentar a una persona que no despertaba. Siguiendo lo aprendido en los tests 1 a 4 (lo que se fija por
+código no vuelve a fallar), los dos se resuelven con código y el prompt solo se ajusta en la regla de los números.
+
+Cambios en el bot (`src/rag.py`):
+1. Prompt: no mencionar por cuenta propia 131, 132 ni 133 y recomendar los contactos de la sede. Si la persona
+   pregunta directamente por esos números, el sistema los agrega.
+2. `pregunta_por_externos()`: detecta cuando la persona pregunta por un número externo ("¿llamo al 131?", "¿cuál
+   es el número de carabineros?", "llamen a una ambulancia"). Solo nombrarlo no cuenta ("ya llegaron los
+   bomberos"). Se verificó que no se activa en ninguno de los 452 casos de riesgo vital. En ese caso se agrega la
+   frase fija con los números de Chile (131 SAMU, 132 Bomberos, 133 Carabineros) y el contacto de la sede.
+3. `quitar_numeros_externos()`: si el modelo igual escribe 131, 132 o 133, esa oración se cambia por el contacto
+   de la sede (Salud o Seguridad según la categoría), en vez de solo borrarla.
+4. `quitar_sentar()`: si la persona contó que el afectado no responde o no despierta (y no dijo después que
+   despertó), la oración que pide sentarlo o levantarlo se cambia por una frase fija de posición lateral. Las
+   frases que lo niegan ("no intentes levantarla") se mantienen. Probado sobre las respuestas del test 4: corrige
+   los dos casos de SAL-001-V1 y el del 131, sin tocar otras respuestas.
+5. Todo el post-proceso queda en una función, `postproceso()`: promesas, números externos, sentar y contactos.
+
+Cambio en la evaluación: el chequeo `sin_numeros_externos` revisa solo lo que escribió el modelo; la frase fija
+con los números de Chile, que aparece solo cuando la persona los pregunta, no cuenta como fallo.
+
+Escenarios: `docs/escenarios_orientacion_test5.json`: los 45 del test 4 sin cambios más 2 de validación nuevos
+(`SAL-001-V3`: desmayado que no reacciona y "¿llamo al 131?"; `SEG-003-V2`: robo y "¿cuál es el número de
+carabineros?").
+
 Resultado: pendiente.

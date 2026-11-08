@@ -28,6 +28,7 @@ ESCENARIOS_BASE = json.loads((DOCS / "escenarios_orientacion.json").read_text(en
 ESCENARIOS = json.loads((DOCS / "escenarios_orientacion_test2.json").read_text(encoding="utf-8"))  # test 2
 ESCENARIOS_TEST3 = json.loads((DOCS / "escenarios_orientacion_test3.json").read_text(encoding="utf-8"))  # test 3
 ESCENARIOS_TEST4 = json.loads((DOCS / "escenarios_orientacion_test4.json").read_text(encoding="utf-8"))  # test 4
+ESCENARIOS_TEST5 = json.loads((DOCS / "escenarios_orientacion_test5.json").read_text(encoding="utf-8"))  # test 5
 TEXTO_PROTOCOLOS = (DOCS / "protocolos_completos.txt").read_text(encoding="utf-8")
 # "SAL-001 — ..." seguido de "ID Subcategoría (BD): 1 — Urgencia"
 SUBCATEGORIA_DE = dict(re.findall(r"^((?:SAL|INF|SEG)-\d+) — .*?ID Subcategoría \(BD\): \d+ — ([^\n]+)",
@@ -81,8 +82,8 @@ def test_casos_riesgo_vital_bien_formados():
     assert 0.35 < positivos / len(CASOS) < 0.65  # set balanceado
 
 
-@pytest.mark.parametrize("escenarios", [ESCENARIOS_BASE, ESCENARIOS, ESCENARIOS_TEST3, ESCENARIOS_TEST4],
-                         ids=["base", "test2", "test3", "test4"])
+@pytest.mark.parametrize("escenarios", [ESCENARIOS_BASE, ESCENARIOS, ESCENARIOS_TEST3, ESCENARIOS_TEST4, ESCENARIOS_TEST5],
+                         ids=["base", "test2", "test3", "test4", "test5"])
 def test_escenarios_bien_formados(escenarios):
     ids = [e["id"] for e in escenarios]
     assert len(ids) == len(set(ids))
@@ -505,3 +506,80 @@ def test_con_contacto_reemplaza_la_negativa_y_no_duplica():
     r = rag.con_contacto("No es necesario que llames a seguridad. No persigas a nadie.", (rag.CONTACTO_SEGURIDAD,))
     assert r == f"No persigas a nadie. {rag.CONTACTO_SEGURIDAD}"
     assert rag.con_contacto("Quédate sentada.", ()) == "Quédate sentada."
+
+
+def test_test5_agrega_validacion_de_numeros_externos_sin_tocar_test4():
+    test4 = {e["id"]: e for e in ESCENARIOS_TEST4}
+    nuevos = [e for e in ESCENARIOS_TEST5 if e["id"] not in test4]
+    assert all(e == test4[e["id"]] for e in ESCENARIOS_TEST5 if e["id"] in test4)
+    assert len(ESCENARIOS_TEST5) == len(test4) + 2
+    assert {e["id"] for e in nuevos} == {"SAL-001-V3", "SEG-003-V2"}
+    assert all(e["conjunto"] == "validacion" for e in nuevos)
+
+
+@pytest.mark.parametrize("mensaje, esperado", [
+    ("mi compañero se desmayó y no reacciona, ¿llamo al 131?", True),
+    ("¿cuál es el número de carabineros?", True),
+    ("llamen a una ambulancia", True),
+    ("¿hay que llamar a bomberos?", True),
+    ("ya llegaron los bomberos", False),
+    ("estoy en la sala 131", False),
+    ("me robaron el celular", False),
+])
+def test_pregunta_por_externos(mensaje, esperado):
+    assert rag.pregunta_por_externos(mensaje) is esperado
+
+
+def test_pregunta_por_externos_sin_falsos_positivos_en_los_casos_de_riesgo_vital():
+    validacion = json.loads((DOCS / "casos_riesgo_vital_validacion.json").read_text(encoding="utf-8"))
+    for c in [*CASOS, *validacion]:
+        assert not rag.pregunta_por_externos(c["mensaje"]), c["mensaje"]
+
+
+def test_contactos_a_agregar_numeros_de_chile_con_contacto_de_la_sede():
+    assert rag.contactos_a_agregar("¿llamo al 131?", "Salud") == (rag.NUMEROS_CHILE, rag.CONTACTO_SALUD)
+    assert rag.contactos_a_agregar("¿cuál es el número de carabineros?", "Seguridad") == \
+        (rag.NUMEROS_CHILE, rag.CONTACTO_SEGURIDAD)
+    assert rag.contactos_a_agregar("me siento mal", "Salud") == ()
+
+
+def test_quitar_numeros_externos_cambia_la_oracion_por_el_contacto_de_la_sede():
+    texto = "No hagas esfuerzos. Si empeoras, llama al 131."
+    assert rag.quitar_numeros_externos(texto, "Salud") == f"No hagas esfuerzos. {rag.CONTACTO_SALUD}"
+    assert rag.quitar_numeros_externos("Llama al 133. Puedes llamar al anexo 999.", "Seguridad") == \
+        "Puedes llamar al anexo 999."
+    assert rag.quitar_numeros_externos("No persigas a nadie.", "Seguridad") == "No persigas a nadie."
+
+
+def _usuario(*textos):
+    return [{"role": "user", "content": [{"text": t}]} for t in textos]
+
+
+def test_quitar_sentar_solo_si_no_responde():
+    no_resp = _usuario("mi compañera se desmayó y no despierta")
+    r = rag.quitar_sentar("Acompáñala y mantenla en reposo, sentada o semisentada. Vigila si respira.", no_resp)
+    assert r == f"{rag.NO_SENTAR} Vigila si respira."
+    # la negación correcta se mantiene
+    assert rag.quitar_sentar("No la muevas ni intentes levantarla.", no_resp) == "No la muevas ni intentes levantarla."
+    # si la persona responde, sentarse puede ser correcto (mareo, dolor de pecho)
+    assert rag.quitar_sentar("Quédate sentada.", _usuario("estoy mareada")) == "Quédate sentada."
+    assert rag.quitar_sentar("Siéntalo con cuidado.", _usuario("no despierta", "ya despertó y me habla")) == \
+        "Siéntalo con cuidado."
+
+
+def test_postproceso_completo_con_numero_externo_preguntado():
+    mensajes = _usuario("mi compañero se desmayó y no reacciona, ¿llamo al 131?")
+    texto = "Siéntalo con cuidado. Sí, llama al 131. Acompáñalo sin dejarlo solo."
+    r = rag.postproceso(texto, mensajes, {"categoria": "Salud", "estado_incidente": "Recibido"})
+    assert r == f"{rag.NO_SENTAR} Acompáñalo sin dejarlo solo. {rag.NUMEROS_CHILE} {rag.CONTACTO_SALUD}"
+
+
+def test_numeros_de_chile_en_frase_fija_no_cuentan_como_numero_externo():
+    from orientacion import chequeos_deterministas
+    e = next(x for x in ESCENARIOS_TEST5 if x["id"] == "SAL-001-V3")
+    bot = [{"respuesta": f"{rag.AVISO} Acompáñalo. {rag.NUMEROS_CHILE} {rag.CONTACTO_SALUD}", "riesgo_vital": True}]
+    v = {c["grupo"]: c["cumple"] for c in chequeos_deterministas(e, bot, rag.AVISO, rag.FRASES_FIJAS)}
+    assert v["sin_numeros_externos"]
+    bot = [{"respuesta": f"{rag.AVISO} Llama al 131.", "riesgo_vital": True}]
+    v = {c["grupo"]: c["cumple"] for c in chequeos_deterministas(e, bot, rag.AVISO, rag.FRASES_FIJAS)}
+    assert not v["sin_numeros_externos"]

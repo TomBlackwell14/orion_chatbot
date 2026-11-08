@@ -46,7 +46,14 @@ MENSAJES_ESTADO = {
 CONTACTO_SALUD = "Teléfono de Salud de la sede (policlínico): +56 32 227 7888."
 CONTACTO_SEGURIDAD = "Teléfono de Seguridad de la sede: anexo 999 desde un teléfono interno, o +56 32 227 7999 desde celular."
 CONTACTO_INFRAESTRUCTURA = "No hay un teléfono de Mantenimiento para entregar: tu reporte ya quedó registrado y lo verá el personal."
-FRASES_FIJAS = (AVISO, *MENSAJES_ESTADO.values(), CONTACTO_SALUD, CONTACTO_SEGURIDAD, CONTACTO_INFRAESTRUCTURA)
+# Números de emergencia de Chile: el modelo no los escribe. Solo se entregan, con este texto fijo, cuando la persona
+# pregunta directamente por ellos ("¿llamo al 131?", "¿cuál es el número de carabineros?").
+NUMEROS_CHILE = "Los números de emergencia de Chile son 131 (Ambulancia SAMU), 132 (Bomberos) y 133 (Carabineros)."
+# Reemplaza la indicación de sentar o levantar a alguien que no responde (GEN-000 y SAL-001).
+NO_SENTAR = ("No sientes ni levantes a la persona; si respira y no hubo golpe, ponla de lado (posición lateral de "
+             "seguridad) y quédate con ella.")
+FRASES_FIJAS = (AVISO, *MENSAJES_ESTADO.values(), CONTACTO_SALUD, CONTACTO_SEGURIDAD, CONTACTO_INFRAESTRUCTURA,
+                NUMEROS_CHILE, NO_SENTAR)
 
 REGLAS_ORION = f"""REGLAS QUE NUNCA SE ROMPEN:
 - Tú solo orientas con texto. No ejecutas acciones en el sistema.
@@ -57,7 +64,9 @@ REGLAS_ORION = f"""REGLAS QUE NUNCA SE ROMPEN:
   digas que no llame, que no es necesario llamar ni que no puedes darle un teléfono. Si pide un teléfono, el sistema
   agrega el contacto correcto al final de tu respuesta: no lo escribas tú. Si no lo pidió pero necesita comunicarse
   directamente, puedes entregar el contacto de la sede: {CONTACTOS_SEDE}. No existe un contacto de Infraestructura
-  ni de Mantenimiento. No menciones números de emergencia externos (131, 132, 133 u otros).
+  ni de Mantenimiento. No menciones por tu cuenta números de emergencia externos (131, 132, 133 u otros): recomienda
+  los contactos de la sede. Si la persona pregunta directamente por esos números, el sistema agrega al final de tu
+  respuesta cuáles son los de Chile: no los escribas tú.
 - No cambies ni sugieras cambiar la categoría, la subcategoría, la prioridad ni el respondedor.
 - No inventes rutas de evacuación, salidas, "la zona más cercana", distancias ni tiempos. Puedes recomendar alejarse
   del peligro y seguir la señalética y las indicaciones del personal o de las autoridades.
@@ -438,10 +447,8 @@ def _responder_con_modelo(mensajes: list[dict], contexto: dict, senales: list[st
     riesgo_modelo = _a_bool(datos.get("riesgo_vital", False))
     riesgo_detector = detector.result() if detector else None
     return {
-        "respuesta_texto": con_aviso(
-            con_contacto(quitar_promesas(str(datos["respuesta_texto"]).strip(), contexto.get("estado_incidente")),
-                         contacto_pedido(mensajes[-1]["content"][0]["text"], contexto.get("categoria"))),
-            mensajes, contexto.get("estado_incidente")),
+        "respuesta_texto": con_aviso(postproceso(str(datos["respuesta_texto"]).strip(), mensajes, contexto),
+                                     mensajes, contexto.get("estado_incidente")),
         # Reglas y detector solo pueden subir a true; nunca bajan lo que decidió el modelo
         "riesgo_vital": riesgo_modelo or bool(riesgo_detector) or bool(senales),
         "protocolo": str(protocolo) if protocolo else None,
@@ -505,6 +512,87 @@ def con_contacto(texto: str, contactos: tuple[str, ...]) -> str:
     if len(quedan) != len(oraciones):
         log.warning("se reemplazaron %d oraciones sobre contactos por el contacto fijo", len(oraciones) - len(quedan))
     return " ".join([*quedan, *contactos]).strip()
+
+
+_NUMEROS_EXTERNOS = re.compile(r"\b13[1-3]\b")
+_NOMBRA_EXTERNO = re.compile(r"\b13[1-3]\b|\b(?:samu|ambulancias?|bomberos|carabineros|pdi|polic[ií]a)\b", re.IGNORECASE)
+_QUIERE_LLAMAR = re.compile(r"\?|\b(?:llamo|llamar|llamamos|llamen|llama|n[uú]meros?|tel[eé]fonos?|fonos?)\b", re.IGNORECASE)
+
+
+def pregunta_por_externos(mensaje_usuario: str) -> bool:
+    """True si la persona pregunta directamente por un número externo ("¿llamo al 131?", "número de carabineros").
+    Solo nombrarlo sin preguntar ("ya llegaron los bomberos") no cuenta."""
+    m = mensaje_usuario or ""
+    return bool(_NOMBRA_EXTERNO.search(m) and _QUIERE_LLAMAR.search(m))
+
+
+def contacto_institucional(categoria: str | None) -> str:
+    return CONTACTO_SALUD if (categoria or "").lower() == "salud" else CONTACTO_SEGURIDAD
+
+
+def contactos_a_agregar(mensaje_usuario: str, categoria: str | None) -> tuple[str, ...]:
+    """Contactos fijos para el final de la respuesta: el teléfono de la sede si lo pidió y, si preguntó por los
+    números de Chile, esos números junto con el contacto institucional que se recomienda."""
+    pedidos = contacto_pedido(mensaje_usuario, categoria)
+    if not pregunta_por_externos(mensaje_usuario):
+        return pedidos
+    return (NUMEROS_CHILE, *(pedidos or (contacto_institucional(categoria),)))
+
+
+def quitar_numeros_externos(texto: str, categoria: str | None) -> str:
+    """El modelo no debe escribir 131, 132 ni 133 (GEN-000). Si lo hace, la oración se reemplaza por el contacto
+    institucional que corresponde a la categoría, en vez de solo borrarla."""
+    oraciones = re.split(r"(?<=[.!?])\s+", texto.strip())
+    quedan = [o for o in oraciones if not _NUMEROS_EXTERNOS.search(o)]
+    if len(quedan) == len(oraciones):
+        return texto
+    log.warning("se reemplazaron %d oraciones con números externos por el contacto de la sede",
+                len(oraciones) - len(quedan))
+    if not any(_NUMERO_SEDE.search(o) for o in quedan):
+        quedan.append(contacto_institucional(categoria))
+    return " ".join(quedan)
+
+
+_NO_RESPONDE = re.compile(r"\bno\s+(?:me\s+|nos\s+|le\s+)?(?:responde|despierta|reacciona|abre\s+los\s+ojos)\b|"
+                          r"\binconscientes?\b|\bperdi[oó]\s+el\s+conocimiento\b|\bsin\s+conocimiento\b", re.IGNORECASE)
+_RECUPERADO = re.compile(r"(?<!no )\b(?:despert[oó]|reaccion[oó]|abri[oó]\s+los\s+ojos)\b|\bya\s+responde\b", re.IGNORECASE)
+_SENTAR = re.compile(r"\b(?:semi)?sentad[oa]s?\b|\bsi[eé]nta(?:la|lo|le)\b|\bsentarl[oa]\b|\bincorp[oó]ra(?:la|lo)\b|"
+                     r"\blev[aá]nta(?:la|lo)\b|\blevantarl[oa]\b", re.IGNORECASE)
+
+_NEGACION_PREVIA = re.compile(r"\b(?:no|ni|nunca|sin)\s+(?:\S+\s+){0,3}$", re.IGNORECASE)
+
+
+def quitar_sentar(texto: str, mensajes: list[dict]) -> str:
+    """Si la persona contó que el afectado no responde (y no dijo después que despertó), se reemplazan las oraciones
+    que piden sentarlo o levantarlo por la indicación fija de posición lateral (GEN-000 y SAL-001)."""
+    usuario = [m["content"][0]["text"] for m in mensajes if m["role"] == "user"]
+    if not usuario or not any(_NO_RESPONDE.search(u) for u in usuario) or _RECUPERADO.search(usuario[-1]):
+        return texto
+    oraciones = re.split(r"(?<=[.!?])\s+", texto.strip())
+    salida, puesta = [], False
+    for o in oraciones:
+        m = _SENTAR.search(o)
+        # "No la muevas ni intentes levantarla" es correcta: solo se reemplaza la indicación afirmativa
+        if m and not _NEGACION_PREVIA.search(o[:m.start()]):
+            if not puesta:
+                salida.append(NO_SENTAR)
+                puesta = True
+        else:
+            salida.append(o)
+    if puesta:
+        log.warning("se reemplazó la indicación de sentar a alguien que no responde")
+    return " ".join(salida)
+
+
+def postproceso(texto: str, mensajes: list[dict], contexto: dict) -> str:
+    """Correcciones deterministas sobre el texto del modelo, en orden: promesas, números externos, sentar a quien no
+    responde y contactos pedidos."""
+    ultimo = mensajes[-1]["content"][0]["text"]
+    categoria = contexto.get("categoria")
+    texto = quitar_promesas(texto, contexto.get("estado_incidente"))
+    texto = quitar_numeros_externos(texto, categoria)
+    texto = quitar_sentar(texto, mensajes)
+    return con_contacto(texto, contactos_a_agregar(ultimo, categoria))
 
 
 def quitar_promesas(texto: str, estado_incidente: str | None) -> str:

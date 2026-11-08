@@ -37,6 +37,9 @@ el incidente a Crítica.
 | Pide un teléfono de salud, o no dice cuál y el incidente es de Salud | Teléfono de Salud de la sede (policlínico): +56 32 227 7888. |
 | Pide un teléfono de seguridad o guardias, o no dice cuál (Seguridad u otra) | Teléfono de Seguridad de la sede: anexo 999 desde un teléfono interno, o +56 32 227 7999 desde celular. |
 | Pide un teléfono de mantención, o no dice cuál y el incidente es de Infraestructura | No hay un teléfono de Mantenimiento para entregar: tu reporte ya quedó registrado y lo verá el personal. (más el de Seguridad) |
+| Pregunta directamente por 131, 132, 133, ambulancia, bomberos o carabineros | Los números de emergencia de Chile son 131 (Ambulancia SAMU), 132 (Bomberos) y 133 (Carabineros). (más el contacto de la sede según la categoría) |
+| El modelo escribe 131, 132 o 133 sin que se lo pregunten | Esa oración se cambia por el contacto de la sede (Salud si el incidente es de Salud; si no, Seguridad). |
+| La persona contó que el afectado no responde o no despierta, y el modelo pide sentarlo o levantarlo | No sientes ni levantes a la persona; si respira y no hubo golpe, ponla de lado (posición lateral de seguridad) y quédate con ella. |
 
 Si el modelo escribe que no puede dar el número o que no es necesario llamar, esa oración se borra y queda el
 contacto fijo. Los números salen de GEN-000 sección 7; si cambian, se actualizan en `rag.py` y en el protocolo.
@@ -171,6 +174,8 @@ Hay dos sets de escenarios y ninguno reemplaza al otro (ver `docs/bitacora_prueb
   con `"conjunto": "validacion"`, que no se usaron para ajustar el bot). El reporte los muestra por separado.
 - `docs/escenarios_orientacion_test4.json`: test 4 (los 42 del test 3 sin cambios, más 3 de validación en los que
   la persona pide un teléfono).
+- `docs/escenarios_orientacion_test5.json`: test 5 (los 45 del test 4 sin cambios, más 2 de validación en los que
+  la persona pregunta por un número de emergencia de Chile).
 
 Cada corrida guarda una copia de los escenarios usados en `escenarios_usados.json`, y la carpeta de resultados
 lleva el nombre del set (`orientacion_<fecha>` o `orientacion_test2_<fecha>`).
@@ -195,6 +200,7 @@ python evaluar_orientacion.py --desde ../resultados/orientacion_<fecha>   # re-j
 python evaluar_orientacion.py --escenarios docs/escenarios_orientacion_test2.json --sin-juez   # test 2
 python evaluar_orientacion.py --escenarios docs/escenarios_orientacion_test3.json --sin-juez   # test 3
 python evaluar_orientacion.py --escenarios docs/escenarios_orientacion_test4.json --sin-juez   # test 4
+python evaluar_orientacion.py --escenarios docs/escenarios_orientacion_test5.json --sin-juez   # test 5
 ```
 
 **Validar al juez**: cada corrida deja `revision_manual.csv` con una muestra de conversaciones. Completa la columna
