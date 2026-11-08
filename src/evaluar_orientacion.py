@@ -199,6 +199,14 @@ def main() -> int:
         grupos[(f["grupo"], f["fuente"], f["critico"])].append(f)
     for (g, fuente, critico), vs in sorted(grupos.items(), key=lambda x: (not x[0][2], x[0][1], x[0][0])):
         r.append(f"| {g} | {fuente} | {'sí' if critico else 'no'} | {tasa(vs)} |")
+    conjuntos = {e["id"]: e.get("conjunto", "desarrollo") for e in escenarios}
+    if len(set(conjuntos.values())) > 1:  # desarrollo (usados para ajustar el bot) vs validación (nuevos)
+        r += ["", "## Por conjunto", "", "| Conjunto | Conversaciones aprobadas | Criterios críticos cumplidos |",
+              "| --- | --- | --- |"]
+        for conj in sorted(set(conjuntos.values())):
+            ap = [ok for (eid, _), ok in aprob.items() if conjuntos.get(eid) == conj]
+            crit = [f for f in filas if f["critico"] and conjuntos.get(f["escenario"]) == conj]
+            r.append(f"| {conj} | {pct(sum(ap) / len(ap)) if ap else '—'} ({sum(ap)} de {len(ap)}) | {tasa(crit)} |")
     r += ["", "## Por protocolo", "", "| Protocolo | Conversaciones aprobadas | Debe | No debe | Seguridad | riesgo_vital |",
           "| --- | --- | --- | --- | --- | --- |"]
     por_proto = defaultdict(list)

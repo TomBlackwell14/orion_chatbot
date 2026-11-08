@@ -153,6 +153,8 @@ Hay dos sets de escenarios y ninguno reemplaza al otro (ver `docs/bitacora_prueb
 - `docs/escenarios_orientacion.json`: test 1, línea base (32 conversaciones). Se usa por defecto.
 - `docs/escenarios_orientacion_test2.json`: test 2 (los mismos 32 más 2 nuevos: la persona afectada es quien
   escribe, y un respondedor ya en camino). Se elige con `--escenarios`.
+- `docs/escenarios_orientacion_test3.json`: test 3 (los 34 del test 2 sin cambios, más 8 de validación marcados
+  con `"conjunto": "validacion"`, que no se usaron para ajustar el bot). El reporte los muestra por separado.
 
 Cada corrida guarda una copia de los escenarios usados en `escenarios_usados.json`, y la carpeta de resultados
 lleva el nombre del set (`orientacion_<fecha>` o `orientacion_test2_<fecha>`).
@@ -175,6 +177,7 @@ python evaluar_orientacion.py --sin-juez -n 1                 # primero, sin cos
 python evaluar_orientacion.py                                 # 3 repeticiones con juez
 python evaluar_orientacion.py --desde ../resultados/orientacion_<fecha>   # re-juzga sin volver a llamar al bot
 python evaluar_orientacion.py --escenarios docs/escenarios_orientacion_test2.json --sin-juez   # test 2
+python evaluar_orientacion.py --escenarios docs/escenarios_orientacion_test3.json --sin-juez   # test 3
 ```
 
 **Validar al juez**: cada corrida deja `revision_manual.csv` con una muestra de conversaciones. Completa la columna

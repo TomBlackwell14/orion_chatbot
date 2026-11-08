@@ -72,16 +72,23 @@ CÓMO RESPONDER:
    Haz como máximo 1 o 2 preguntas por mensaje. Cuando corresponda, termina con la pregunta decisiva del protocolo:
    la que confirma o descarta la señal más grave (si responde, si respira, si hay heridos, armas o personas expuestas,
    si quiere hacerse daño), sin repetir lo que la persona ya contestó.
-5. Si no queda claro si quien escribe es la persona afectada o está ayudando a otra, pregúntalo en tu primera
-   respuesta junto a la indicación más urgente (por ejemplo: "¿Eres tú quien se siente mal o es otra persona?").
-   Si quien escribe es el afectado, háblale directamente a él o ella, no como si fuera un tercero.
-6. Decide riesgo_vital con el "CRITERIO GENERAL DE RIESGO VITAL" del MARCO GENERAL. Las señales de cada protocolo
+5. Quién es el afectado casi siempre está claro en el mensaje: "mi compañero", "un señor", "hay alguien" es otra
+   persona; "me duele", "estoy mareada", "me robaron" es quien escribe. Entonces NO preguntes quién es el afectado.
+   Pregúntalo solo en una emergencia de salud cuando el mensaje no lo dice, y nunca como primera frase: primero va
+   la indicación más urgente. No lo preguntes en robos, peleas, amenazas, objetos sospechosos, incendios, sismos ni
+   fallas de infraestructura. Si quien escribe es el afectado, háblale directamente a él o ella.
+6. Pide alejarse solo cuando hay un peligro en el entorno (fuego, humo, gas, electricidad, una estructura dañada,
+   un arma o un agresor presente). Si la persona afectada necesita ayuda y ese peligro no existe (malestar,
+   convulsión, dolor de pecho, crisis emocional, ideas de hacerse daño), pide acompañarla sin dejarla sola, siempre
+   que sea seguro. Nunca pidas sentar ni levantar a alguien que no responde. Ante una amenaza, no ordenes evacuar:
+   eso lo decide el personal.
+7. Decide riesgo_vital con el "CRITERIO GENERAL DE RIESGO VITAL" del MARCO GENERAL. Las señales de cada protocolo
    son ejemplos, no una lista cerrada: cualquier riesgo de muerte o de secuela grave (D.S. 34/2022) cuenta, aunque no
    aparezca en ninguna lista. Una pelea, un sismo, una fractura cerrada o un delito, por sí solos, no son riesgo vital.
    Si una señal es probable pero no está descrita, deja riesgo_vital = false y pregunta por ella en este mismo mensaje.
    Si el usuario confirma una señal por la que preguntaste, o si quien escribe es el afectado y describe una señal,
    esa señal ya está descrita: riesgo_vital = true.
-7. Si el mensaje no tiene relación con la emergencia, redirige amablemente al tema.
+8. Si el mensaje no tiene relación con la emergencia, redirige amablemente al tema.
 
 FORMATO DE SALIDA: responde SOLO con un objeto JSON válido, sin texto adicional ni bloques de código:
 {{"respuesta_texto": "texto para la persona", "riesgo_vital": false, "protocolo": "SAL-001"}}
@@ -201,14 +208,24 @@ def buscar_contexto(consulta: str, k: int = TOP_K_RESULTS) -> list[tuple[str, st
 
 # ---------- Historial ----------
 
+def sin_frases_fijas(texto: str) -> str:
+    """Quita el aviso y la frase de "Recibido" que agrega el código, para que el modelo no las copie al responder.
+    La de En_camino se deja: con_aviso la busca en el historial para decirla una sola vez."""
+    for frase in (AVISO, MENSAJES_ESTADO["Recibido"]):
+        texto = texto.replace(frase, " ")
+    return re.sub(r"\s+", " ", texto).strip()
+
+
 def normalizar_historial(historial: list[dict]) -> list[dict]:
     """Convierte [{rol, texto}] al formato Converse: empieza con user y alterna roles."""
     mensajes: list[dict] = []
     for m in historial[-MAX_HISTORIAL:]:
         texto = (m.get("texto") or "").strip()
+        rol = "assistant" if m.get("rol") == "bot" else "user"
+        if rol == "assistant":
+            texto = sin_frases_fijas(texto) or "(orientación entregada)"
         if not texto:
             continue
-        rol = "assistant" if m.get("rol") == "bot" else "user"
         if mensajes and mensajes[-1]["role"] == rol:
             mensajes[-1]["content"][0]["text"] += "\n" + texto
         else:
@@ -430,6 +447,7 @@ def _responder_con_modelo(mensajes: list[dict], contexto: dict, senales: list[st
 _PROMESAS = re.compile(
     r"\b(?:ya\s+)?(?:fue|fueron|ha sido|han sido|est[aá]n?)\s+(?:notificad|avisad|alertad)\w*|"
     r"\b(?:llam[eé]|llamar[eé]|llamamos|voy a llamar|avis[eé]|notifiqu[eé])\b|"
+    r"\b(?:avisaremos|notificaremos|alertaremos|llamaremos|vamos a (?:avisar|notificar|llamar))\b|"
     r"\b(?:en|dentro de)\s+(?:unos?\s+)?\d+\s*(?:min|minutos|segundos)\b|tiempo estimado|llegar[áa]n? en", re.IGNORECASE)
 _EN_CAMINO = re.compile(r"\b(?:va|van|viene|vienen|est[aá]n?)\s+(?:ya\s+)?en\s+camino\b", re.IGNORECASE)
 
@@ -449,10 +467,14 @@ def es_primera_respuesta(mensajes: list[dict]) -> bool:
     return not any(m["role"] == "assistant" for m in mensajes)
 
 
+_AVISO_DEL_MODELO = re.compile(r"ORION es una gu[ií]a de apoyo\.\s*No sustituye[^.]*\.\s*", re.IGNORECASE)
+
+
 def con_aviso(texto: str, mensajes: list[dict], estado_incidente: str | None = None) -> str:
     """Frases fijas agregadas por código (no dependen del modelo):
     - primera respuesta: aviso legal al inicio y el estado real del reporte;
     - si el incidente pasó a En_camino y aún no se dijo en la conversación, se informa una vez."""
+    texto = _AVISO_DEL_MODELO.sub("", texto).strip() or texto  # el aviso lo pone solo el código
     estado = MENSAJES_ESTADO.get(estado_incidente or "")
     dicho = any(estado and estado in m["content"][0]["text"] for m in mensajes if m["role"] == "assistant")
     if es_primera_respuesta(mensajes):

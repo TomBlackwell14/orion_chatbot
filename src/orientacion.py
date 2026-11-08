@@ -81,7 +81,9 @@ _EN_CAMINO = re.compile(r"\b(?:va|van|viene|vienen|esta|estan|está|están)\s+en
 _TIEMPOS = re.compile(r"\b(?:en|dentro de)\s+(?:unos?\s+)?\d+\s*(?:min|minutos|segundos)\b|tiempo estimado|llegar[áa]n? en",
                       re.IGNORECASE)
 _NOTIFICADO = re.compile(r"\b(?:ya\s+)?(?:fue|fueron|ha sido|han sido|está|están)\s+(?:notificad|avisad|alertad)\w*|"
-                         r"\b(?:llamé|llamaré|llamamos|voy a llamar|avisé|notifiqué)\b", re.IGNORECASE)
+                         r"\b(?:llamé|llamaré|llamamos|voy a llamar|avisé|notifiqué)\b|"
+                         r"\b(?:avisaremos|notificaremos|alertaremos|llamaremos|vamos a (?:avisar|notificar|llamar))\b",
+                         re.IGNORECASE)
 
 
 def chequeos_deterministas(escenario: dict, turnos_bot: list[dict], aviso: str,

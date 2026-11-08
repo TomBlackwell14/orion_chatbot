@@ -26,6 +26,7 @@ from orientacion import chequeos_deterministas, criterios_juez, parsear_veredict
 CASOS = json.loads((DOCS / "casos_riesgo_vital.json").read_text(encoding="utf-8"))
 ESCENARIOS_BASE = json.loads((DOCS / "escenarios_orientacion.json").read_text(encoding="utf-8"))  # test 1 (línea base)
 ESCENARIOS = json.loads((DOCS / "escenarios_orientacion_test2.json").read_text(encoding="utf-8"))  # test 2
+ESCENARIOS_TEST3 = json.loads((DOCS / "escenarios_orientacion_test3.json").read_text(encoding="utf-8"))  # test 3
 TEXTO_PROTOCOLOS = (DOCS / "protocolos_completos.txt").read_text(encoding="utf-8")
 # "SAL-001 — ..." seguido de "ID Subcategoría (BD): 1 — Urgencia"
 SUBCATEGORIA_DE = dict(re.findall(r"^((?:SAL|INF|SEG)-\d+) — .*?ID Subcategoría \(BD\): \d+ — ([^\n]+)",
@@ -79,7 +80,7 @@ def test_casos_riesgo_vital_bien_formados():
     assert 0.35 < positivos / len(CASOS) < 0.65  # set balanceado
 
 
-@pytest.mark.parametrize("escenarios", [ESCENARIOS_BASE, ESCENARIOS], ids=["base", "test2"])
+@pytest.mark.parametrize("escenarios", [ESCENARIOS_BASE, ESCENARIOS, ESCENARIOS_TEST3], ids=["base", "test2", "test3"])
 def test_escenarios_bien_formados(escenarios):
     ids = [e["id"] for e in escenarios]
     assert len(ids) == len(set(ids))
@@ -420,3 +421,44 @@ def test_mensaje_fijo_notificado_no_cuenta_como_promesa():
     v = chequeos_deterministas(esc, [{"respuesta": f"{rag.AVISO} Bomberos ya fue notificado. {fija}", "riesgo_vital": False}],
                                rag.AVISO, tuple(rag.MENSAJES_ESTADO.values()))
     assert not next(x for x in v if x["grupo"] == "sin_promesas")["cumple"]
+
+
+def test_test3_agrega_validacion_sin_tocar_test2():
+    """El test 3 repite los 34 escenarios del test 2 tal cual y suma escenarios nuevos de validación,
+    que no se usaron para ajustar el prompt."""
+    test2 = {e["id"]: e for e in ESCENARIOS}
+    for e in ESCENARIOS_TEST3:
+        if e["id"] in test2:
+            assert e == test2[e["id"]], e["id"]
+        else:
+            assert e.get("conjunto") == "validacion", e["id"]
+    assert len(ESCENARIOS_TEST3) - len(test2) == 8
+
+
+def test_historial_sin_aviso_ni_estado_recibido():
+    texto = f"{rag.AVISO} Presiona la herida. {rag.MENSAJES_ESTADO['Recibido']}"
+    mensajes = rag.normalizar_historial([{"rol": "usuario", "texto": "sangra"}, {"rol": "bot", "texto": texto}])
+    reenviado = json.loads(mensajes[1]["content"][0]["text"])["respuesta_texto"]
+    assert reenviado == "Presiona la herida."
+    solo_fijas = rag.normalizar_historial([{"rol": "usuario", "texto": "a"},
+                                           {"rol": "bot", "texto": f"{rag.AVISO} {rag.MENSAJES_ESTADO['Recibido']}"}])
+    assert len(solo_fijas) == 2  # el turno del bot no desaparece: sigue contando como respuesta previa
+
+
+def test_en_camino_se_dice_una_sola_vez():
+    camino = rag.MENSAJES_ESTADO["En_camino"]
+    mensajes = rag.normalizar_historial([{"rol": "usuario", "texto": "a"}, {"rol": "bot", "texto": f"Hola. {camino}"},
+                                         {"rol": "usuario", "texto": "b"}])
+    assert rag.con_aviso("Sigue presionando.", mensajes, "En_camino") == "Sigue presionando."
+
+
+def test_aviso_escrito_por_el_modelo_se_reemplaza():
+    variante = "ORION es una guía de apoyo. No sustituye a personal de seguridad ni a servicios de emergencia."
+    segunda = rag.normalizar_historial([{"rol": "usuario", "texto": "a"}, {"rol": "bot", "texto": "x"},
+                                        {"rol": "usuario", "texto": "b"}])
+    assert rag.con_aviso(f"{variante} Aléjate de la mochila.", segunda, "Recibido") == "Aléjate de la mochila."
+
+
+def test_filtro_quita_avisaremos():
+    assert rag.quitar_promesas("Vigila su respiración. Avisaremos al personal de salud.", "Recibido") == \
+        "Vigila su respiración."
