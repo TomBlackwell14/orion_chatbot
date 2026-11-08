@@ -35,14 +35,21 @@ bedrock = boto3.client(
 )
 
 AVISO = "ORION es una guía de apoyo. No sustituye a personal de salud ni a servicios de emergencia."
+# Lo que el código dice del estado del incidente (GEN-000 sección 6): siempre verdadero, nunca lo inventa el modelo
+MENSAJES_ESTADO = {
+    "Recibido": "Tu reporte ya fue notificado al equipo de la sede y puedes seguir su estado en la app.",
+    "En_camino": "Un respondedor ya va en camino.",
+}
 
 REGLAS_ORION = f"""REGLAS QUE NUNCA SE ROMPEN:
 - Tú solo orientas con texto. No ejecutas acciones en el sistema.
 - No digas que alguien fue notificado ni des tiempos de llegada.
 - No digas que el personal va en camino, salvo que el estado del incidente sea "En_camino" (entonces puedes decir
   que un respondedor ya va en camino, sin dar tiempos).
-- No llames ni digas que llamarás a nadie. No menciones números de emergencia externos (131, 132, 133 u otros).
-  Si corresponde dar un contacto, usa solo estos de la sede: {CONTACTOS_SEDE}.
+- Tú no haces llamadas ni dices que llamarás o avisarás a alguien. Eso no impide que la persona llame: si pide un
+  teléfono o necesita comunicarse directamente, entrégale el contacto de la sede que corresponda: {CONTACTOS_SEDE}.
+  No existe un contacto de Infraestructura ni de Mantenimiento para entregar: si lo piden, dilo y recuerda que el
+  reporte ya quedó registrado. No menciones números de emergencia externos (131, 132, 133 u otros).
 - No cambies ni sugieras cambiar la categoría, la subcategoría, la prioridad ni el respondedor.
 - No inventes rutas de evacuación, salidas, "la zona más cercana", distancias ni tiempos. Puedes recomendar alejarse
   del peligro y seguir la señalética y las indicaciones del personal o de las autoridades.
@@ -55,18 +62,26 @@ ni el tipo de emergencia.
 {REGLAS_ORION}
 
 CÓMO RESPONDER:
-1. Si es tu primera respuesta tras el mensaje de bienvenida, incluye: "{AVISO}"
-2. Usa ÚNICAMENTE la información de los PROTOCOLOS entregados. Puedes combinar varios si el relato lo requiere.
+1. No escribas el aviso legal ni el estado del reporte: el sistema los agrega solo.
+2. Usa ÚNICAMENTE la información de los PROTOCOLOS entregados y de las REGLAS (incluidos los contactos de la sede).
+   Puedes combinar varios protocolos si el relato lo requiere.
 3. Si la situación no está cubierta, dilo ("No cuento con información suficiente para esa situación.") y pide que
    se mantenga en un lugar seguro.
-4. Lenguaje claro, directo y breve (máximo 4 oraciones). Haz como máximo 1 o 2 preguntas por mensaje.
-5. Decide riesgo_vital con el "CRITERIO GENERAL DE RIESGO VITAL" del MARCO GENERAL. Las señales de cada protocolo
+4. Lenguaje claro, directo y breve (máximo 4 oraciones), en segunda persona (tú). Resume con tus palabras: no copies
+   listas del protocolo ni frases en infinitivo ("Anotar…", "No usar…"), y no menciones códigos como SAL-001.
+   Haz como máximo 1 o 2 preguntas por mensaje. Cuando corresponda, termina con la pregunta decisiva del protocolo:
+   la que confirma o descarta la señal más grave (si responde, si respira, si hay heridos, armas o personas expuestas,
+   si quiere hacerse daño), sin repetir lo que la persona ya contestó.
+5. Si no queda claro si quien escribe es la persona afectada o está ayudando a otra, pregúntalo en tu primera
+   respuesta junto a la indicación más urgente (por ejemplo: "¿Eres tú quien se siente mal o es otra persona?").
+   Si quien escribe es el afectado, háblale directamente a él o ella, no como si fuera un tercero.
+6. Decide riesgo_vital con el "CRITERIO GENERAL DE RIESGO VITAL" del MARCO GENERAL. Las señales de cada protocolo
    son ejemplos, no una lista cerrada: cualquier riesgo de muerte o de secuela grave (D.S. 34/2022) cuenta, aunque no
    aparezca en ninguna lista. Una pelea, un sismo, una fractura cerrada o un delito, por sí solos, no son riesgo vital.
    Si una señal es probable pero no está descrita, deja riesgo_vital = false y pregunta por ella en este mismo mensaje.
    Si el usuario confirma una señal por la que preguntaste, o si quien escribe es el afectado y describe una señal,
    esa señal ya está descrita: riesgo_vital = true.
-6. Si el mensaje no tiene relación con la emergencia, redirige amablemente al tema.
+7. Si el mensaje no tiene relación con la emergencia, redirige amablemente al tema.
 
 FORMATO DE SALIDA: responde SOLO con un objeto JSON válido, sin texto adicional ni bloques de código:
 {{"respuesta_texto": "texto para la persona", "riesgo_vital": false, "protocolo": "SAL-001"}}
@@ -312,7 +327,7 @@ def responder(historial: list[dict], contexto: dict | None = None) -> dict:
         # Si Bedrock falla justo cuando hay una señal explícita, no se pierde la detección: se responde con una
         # indicación fija y riesgo_vital = true, en vez de dejar que el fallback de NestJS lo marque false.
         return {
-            "respuesta_texto": RESPUESTA_SEGURA,
+            "respuesta_texto": con_aviso(RESPUESTA_SEGURA, mensajes, contexto.get("estado_incidente")),
             "riesgo_vital": True,
             "protocolo": None,
             "metadata": {"protocolos_recuperados": [], "senales_regla": senales, "riesgo_vital_modelo": None,
@@ -398,7 +413,9 @@ def _responder_con_modelo(mensajes: list[dict], contexto: dict, senales: list[st
     riesgo_modelo = _a_bool(datos.get("riesgo_vital", False))
     riesgo_detector = detector.result() if detector else None
     return {
-        "respuesta_texto": str(datos["respuesta_texto"]).strip(),
+        "respuesta_texto": con_aviso(quitar_promesas(str(datos["respuesta_texto"]).strip(),
+                                                     contexto.get("estado_incidente")), mensajes,
+                                     contexto.get("estado_incidente")),
         # Reglas y detector solo pueden subir a true; nunca bajan lo que decidió el modelo
         "riesgo_vital": riesgo_modelo or bool(riesgo_detector) or bool(senales),
         "protocolo": str(protocolo) if protocolo else None,
@@ -406,6 +423,47 @@ def _responder_con_modelo(mensajes: list[dict], contexto: dict, senales: list[st
                      "riesgo_vital_modelo": riesgo_modelo, "riesgo_vital_detector": riesgo_detector, "tokens": uso,
                      "reintento_json": bool(intentos)},
     }
+
+
+# ---------- Post-proceso determinista de la respuesta ----------
+
+_PROMESAS = re.compile(
+    r"\b(?:ya\s+)?(?:fue|fueron|ha sido|han sido|est[aá]n?)\s+(?:notificad|avisad|alertad)\w*|"
+    r"\b(?:llam[eé]|llamar[eé]|llamamos|voy a llamar|avis[eé]|notifiqu[eé])\b|"
+    r"\b(?:en|dentro de)\s+(?:unos?\s+)?\d+\s*(?:min|minutos|segundos)\b|tiempo estimado|llegar[áa]n? en", re.IGNORECASE)
+_EN_CAMINO = re.compile(r"\b(?:va|van|viene|vienen|est[aá]n?)\s+(?:ya\s+)?en\s+camino\b", re.IGNORECASE)
+
+
+def quitar_promesas(texto: str, estado_incidente: str | None) -> str:
+    """Borra las oraciones que afirman notificaciones, llegadas o tiempos (regla que el modelo a veces rompe).
+    'En camino' solo se permite cuando el incidente está En_camino."""
+    oraciones = re.split(r"(?<=[.!?])\s+", texto.strip())
+    quedan = [o for o in oraciones if not _PROMESAS.search(o)
+              and (estado_incidente == "En_camino" or not _EN_CAMINO.search(o))]
+    if len(quedan) != len(oraciones):
+        log.warning("se quitaron %d oraciones con promesas de la respuesta", len(oraciones) - len(quedan))
+    return " ".join(quedan) or "Mantente en un lugar seguro y avísame por este chat cualquier cambio."
+
+
+def es_primera_respuesta(mensajes: list[dict]) -> bool:
+    return not any(m["role"] == "assistant" for m in mensajes)
+
+
+def con_aviso(texto: str, mensajes: list[dict], estado_incidente: str | None = None) -> str:
+    """Frases fijas agregadas por código (no dependen del modelo):
+    - primera respuesta: aviso legal al inicio y el estado real del reporte;
+    - si el incidente pasó a En_camino y aún no se dijo en la conversación, se informa una vez."""
+    estado = MENSAJES_ESTADO.get(estado_incidente or "")
+    dicho = any(estado and estado in m["content"][0]["text"] for m in mensajes if m["role"] == "assistant")
+    if es_primera_respuesta(mensajes):
+        partes = [AVISO] if AVISO not in texto else []
+        partes.append(texto)
+        if estado and estado not in texto:
+            partes.append(estado)
+        return " ".join(partes)
+    if estado_incidente == "En_camino" and estado and not dicho and estado not in texto:
+        return f"{texto} {estado}"
+    return texto
 
 
 def _lista_de_textos(valor) -> list[str]:

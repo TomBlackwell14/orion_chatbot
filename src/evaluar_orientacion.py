@@ -72,12 +72,17 @@ def main() -> int:
     p.add_argument("--veredictos-juez", help="JSON con los veredictos de un juez externo, en vez de llamar al juez por API")
     p.add_argument("--muestra", type=int, default=30, help="conversaciones para revisión manual del juez")
     p.add_argument("--salida", default=str(RAIZ / "resultados"))
+    p.add_argument("--escenarios", default=str(ESCENARIOS),
+                   help="archivo de escenarios (por defecto la línea base; test 2: docs/escenarios_orientacion_test2.json)")
     args = p.parse_args()
 
     import rag  # importa boto3; el juez usa su propio cliente
     from config import LLM_MODEL
 
-    escenarios = json.loads(ESCENARIOS.read_text(encoding="utf-8"))
+    archivo_escenarios = Path(args.escenarios)
+    if not archivo_escenarios.is_absolute() and not archivo_escenarios.exists():
+        archivo_escenarios = RAIZ / archivo_escenarios
+    escenarios = json.loads(archivo_escenarios.read_text(encoding="utf-8"))
     if args.ids:
         prefijos = [i.strip() for i in args.ids.split(",")]
         escenarios = [e for e in escenarios if any(e["id"].startswith(pr) for pr in prefijos)]
@@ -86,8 +91,11 @@ def main() -> int:
     marco = protocolos["GEN-000"]
 
     fecha = datetime.now().strftime("%Y-%m-%d_%H%M")
-    carpeta = Path(args.salida) / f"orientacion_{fecha}"
+    sufijo = archivo_escenarios.stem.replace("escenarios_orientacion", "")  # "" o "_test2"
+    carpeta = Path(args.salida) / f"orientacion{sufijo}_{fecha}"
     carpeta.mkdir(parents=True, exist_ok=True)
+    # evidencia: copia exacta de los escenarios usados en esta corrida
+    (carpeta / "escenarios_usados.json").write_text(archivo_escenarios.read_text(encoding="utf-8"), encoding="utf-8")
 
     if args.desde:
         conversaciones = json.loads((Path(args.desde) / "conversaciones.json").read_text(encoding="utf-8"))
@@ -110,7 +118,7 @@ def main() -> int:
     filas, comentarios, errores_juez = [], {}, 0
     for conv in conversaciones:
         e, turnos_bot = por_id[conv["escenario"]], conv["turnos_bot"]
-        veredictos = chequeos_deterministas(e, turnos_bot, rag.AVISO)
+        veredictos = chequeos_deterministas(e, turnos_bot, rag.AVISO, tuple(getattr(rag, "MENSAJES_ESTADO", {}).values()))
         if externos is not None:
             clave = f"{e['id']}#{conv['repeticion']}"
             if clave in externos:

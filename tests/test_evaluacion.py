@@ -24,7 +24,8 @@ from metricas import Matriz, kappa_cohen, wilson  # noqa: E402
 from orientacion import chequeos_deterministas, criterios_juez, parsear_veredictos  # noqa: E402
 
 CASOS = json.loads((DOCS / "casos_riesgo_vital.json").read_text(encoding="utf-8"))
-ESCENARIOS = json.loads((DOCS / "escenarios_orientacion.json").read_text(encoding="utf-8"))
+ESCENARIOS_BASE = json.loads((DOCS / "escenarios_orientacion.json").read_text(encoding="utf-8"))  # test 1 (línea base)
+ESCENARIOS = json.loads((DOCS / "escenarios_orientacion_test2.json").read_text(encoding="utf-8"))  # test 2
 TEXTO_PROTOCOLOS = (DOCS / "protocolos_completos.txt").read_text(encoding="utf-8")
 # "SAL-001 — ..." seguido de "ID Subcategoría (BD): 1 — Urgencia"
 SUBCATEGORIA_DE = dict(re.findall(r"^((?:SAL|INF|SEG)-\d+) — .*?ID Subcategoría \(BD\): \d+ — ([^\n]+)",
@@ -78,16 +79,23 @@ def test_casos_riesgo_vital_bien_formados():
     assert 0.35 < positivos / len(CASOS) < 0.65  # set balanceado
 
 
-def test_escenarios_bien_formados():
-    ids = [e["id"] for e in ESCENARIOS]
+@pytest.mark.parametrize("escenarios", [ESCENARIOS_BASE, ESCENARIOS], ids=["base", "test2"])
+def test_escenarios_bien_formados(escenarios):
+    ids = [e["id"] for e in escenarios]
     assert len(ids) == len(set(ids))
-    for e in ESCENARIOS:
+    for e in escenarios:
         assert e["protocolo"] in SUBCATEGORIA_DE, e["id"]
         assert e["contexto"]["subcategoria"] == SUBCATEGORIA_DE[e["protocolo"]], e["id"]
         assert e["turnos"] and all(t["debe"] or t["no_debe"] for t in e["turnos"]), e["id"]
         criterios = [c["id"] for c in criterios_juez(e)]
         assert len(criterios) == len(set(criterios))
-    assert set(SUBCATEGORIA_DE) == {e["protocolo"] for e in ESCENARIOS}  # todos los protocolos tienen escenario
+    assert set(SUBCATEGORIA_DE) == {e["protocolo"] for e in escenarios}  # todos los protocolos tienen escenario
+
+
+def test_test2_conserva_los_escenarios_de_la_linea_base():
+    """El test 2 agrega escenarios; los de la línea base siguen ahí para comparar antes y después."""
+    base = {e["id"] for e in ESCENARIOS_BASE}
+    assert base <= {e["id"] for e in ESCENARIOS}
 
 
 # ---------- Chequeos deterministas y juez ----------
@@ -348,3 +356,67 @@ def test_detector_recibe_criterio_y_texto_plano_del_bot(monkeypatch):
     system, pedido = vistos[0]
     assert system.startswith("Eres el detector") and "3.4 Cuándo marcar" in pedido
     assert "ASISTENTE: ¿Respira?" in pedido and "respuesta_texto" not in pedido
+
+
+# ---------- Post-proceso: aviso y promesas ----------
+
+def test_quita_promesas_y_conserva_lo_demas():
+    t = "No muevas a la persona. Personal de salud ya fue notificado. Avísales que el personal ya va en camino. Vigila si respira."
+    assert rag.quitar_promesas(t, "Recibido") == "No muevas a la persona. Vigila si respira."
+
+
+def test_en_camino_se_permite_solo_con_estado_en_camino():
+    t = "Presiona la herida. Un respondedor ya va en camino."
+    assert rag.quitar_promesas(t, "En_camino") == t
+    assert rag.quitar_promesas(t, "Recibido") == "Presiona la herida."
+
+
+def test_quitar_promesas_nunca_deja_vacio():
+    assert rag.quitar_promesas("Ya fue notificado.", "Recibido").startswith("Mantente en un lugar seguro")
+
+
+def test_aviso_solo_en_la_primera_respuesta():
+    primera = [{"role": "user", "content": [{"text": "hola"}]}]
+    segunda = primera + [{"role": "assistant", "content": [{"text": "x"}]}, {"role": "user", "content": [{"text": "y"}]}]
+    assert rag.con_aviso("Quédate con la persona.", primera).startswith(rag.AVISO)
+    assert rag.con_aviso("Quédate con la persona.", segunda) == "Quédate con la persona."
+    assert rag.con_aviso(f"{rag.AVISO} Hola.", primera).count(rag.AVISO) == 1
+
+
+def test_prompt_permite_entregar_contactos_de_la_sede():
+    assert "No existe un contacto de Infraestructura" in rag.SYSTEM_PROMPT_CHAT
+    assert "No llames ni digas que llamarás a nadie" not in rag.SYSTEM_PROMPT_CHAT
+
+
+def test_estado_real_en_primera_respuesta_y_en_camino_una_vez():
+    primera = [{"role": "user", "content": [{"text": "hola"}]}]
+    r = rag.con_aviso("Quédate con la persona.", primera, "Recibido")
+    assert r.startswith(rag.AVISO) and r.endswith(rag.MENSAJES_ESTADO["Recibido"])
+    segunda = primera + [{"role": "assistant", "content": [{"text": r}]}, {"role": "user", "content": [{"text": "y"}]}]
+    assert rag.con_aviso("Sigue presionando.", segunda, "Recibido") == "Sigue presionando."
+    con_camino = rag.con_aviso("Sigue presionando.", segunda, "En_camino")
+    assert con_camino.endswith(rag.MENSAJES_ESTADO["En_camino"])
+    tercera = segunda + [{"role": "assistant", "content": [{"text": con_camino}]}, {"role": "user", "content": [{"text": "z"}]}]
+    assert rag.con_aviso("Vigila si respira.", tercera, "En_camino") == "Vigila si respira."
+
+
+def test_frases_fijas_no_cuentan_para_el_largo():
+    esc = {"id": "X", "protocolo": "SAL-001", "contexto": {"estado_incidente": "Recibido"},
+           "turnos": [{"usuario": "a", "esperado_riesgo_vital": False, "debe": ["x"], "no_debe": []}]}
+    texto = f"{rag.AVISO} Uno. Dos. Tres. Cuatro. {rag.MENSAJES_ESTADO['Recibido']}"
+    v = _por_id(chequeos_deterministas(esc, [{"respuesta": texto, "riesgo_vital": False}], rag.AVISO,
+                                       tuple(rag.MENSAJES_ESTADO.values())))
+    assert v["T1.max_4_oraciones"]["cumple"] and v["T1.sin_promesas"]["cumple"]
+
+
+def test_mensaje_fijo_notificado_no_cuenta_como_promesa():
+    esc = {"id": "X", "protocolo": "SAL-001", "contexto": {"estado_incidente": "Recibido"},
+           "turnos": [{"usuario": "a", "esperado_riesgo_vital": False}]}
+    fija = rag.MENSAJES_ESTADO["Recibido"]
+    assert "notificado" in fija
+    v = chequeos_deterministas(esc, [{"respuesta": f"{rag.AVISO} Quédate ahí. {fija}", "riesgo_vital": False}],
+                               rag.AVISO, tuple(rag.MENSAJES_ESTADO.values()))
+    assert next(x for x in v if x["grupo"] == "sin_promesas")["cumple"]
+    v = chequeos_deterministas(esc, [{"respuesta": f"{rag.AVISO} Bomberos ya fue notificado. {fija}", "riesgo_vital": False}],
+                               rag.AVISO, tuple(rag.MENSAJES_ESTADO.values()))
+    assert not next(x for x in v if x["grupo"] == "sin_promesas")["cumple"]

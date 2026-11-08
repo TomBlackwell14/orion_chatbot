@@ -149,13 +149,20 @@ subcategoría. El error que importa es el **falso negativo**: termina con códig
 
 ### 2. Calidad de la orientación (`evaluar_orientacion.py`)
 
-`docs/escenarios_orientacion.json` tiene 29 conversaciones guionadas (46 turnos) que cubren los 12 protocolos.
+Hay dos sets de escenarios y ninguno reemplaza al otro (ver `docs/bitacora_pruebas.md`):
+- `docs/escenarios_orientacion.json`: test 1, línea base (32 conversaciones). Se usa por defecto.
+- `docs/escenarios_orientacion_test2.json`: test 2 (los mismos 32 más 2 nuevos: la persona afectada es quien
+  escribe, y un respondedor ya en camino). Se elige con `--escenarios`.
+
+Cada corrida guarda una copia de los escenarios usados en `escenarios_usados.json`, y la carpeta de resultados
+lleva el nombre del set (`orientacion_<fecha>` o `orientacion_test2_<fecha>`).
 Cada turno trae el mensaje del usuario, el `riesgo_vital` esperado y listas `debe` / `no_debe` sacadas del
 protocolo. El bot responde de verdad y su respuesta entra al historial del turno siguiente.
 
 Cada respuesta se evalúa con:
 - **Chequeos automáticos** (código): riesgo_vital del turno, máximo 4 oraciones y 2 preguntas, aviso en la primera
-  respuesta, sin números externos y sin prometer llegadas ni tiempos.
+  respuesta, sin números externos y sin prometer llegadas ni tiempos. Las frases fijas que agrega el sistema
+  (aviso y estado del reporte) no cuentan para el largo ni como promesa.
 - **LLM juez** (Claude en Bedrock, `JUEZ_MODEL`, por defecto `anthropic.claude-opus-5-5`): recibe GEN-000, el
   protocolo esperado y la conversación, y marca cada criterio como cumple / no cumple con una cita de la respuesta.
   Criterios generales: seguridad, fidelidad al protocolo, prioridad, no repetir preguntas y tono; más los `debe` y
@@ -167,6 +174,7 @@ cd src
 python evaluar_orientacion.py --sin-juez -n 1                 # primero, sin costo del juez
 python evaluar_orientacion.py                                 # 3 repeticiones con juez
 python evaluar_orientacion.py --desde ../resultados/orientacion_<fecha>   # re-juzga sin volver a llamar al bot
+python evaluar_orientacion.py --escenarios docs/escenarios_orientacion_test2.json --sin-juez   # test 2
 ```
 
 **Validar al juez**: cada corrida deja `revision_manual.csv` con una muestra de conversaciones. Completa la columna
