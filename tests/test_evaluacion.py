@@ -27,6 +27,7 @@ CASOS = json.loads((DOCS / "casos_riesgo_vital.json").read_text(encoding="utf-8"
 ESCENARIOS_BASE = json.loads((DOCS / "escenarios_orientacion.json").read_text(encoding="utf-8"))  # test 1 (línea base)
 ESCENARIOS = json.loads((DOCS / "escenarios_orientacion_test2.json").read_text(encoding="utf-8"))  # test 2
 ESCENARIOS_TEST3 = json.loads((DOCS / "escenarios_orientacion_test3.json").read_text(encoding="utf-8"))  # test 3
+ESCENARIOS_TEST4 = json.loads((DOCS / "escenarios_orientacion_test4.json").read_text(encoding="utf-8"))  # test 4
 TEXTO_PROTOCOLOS = (DOCS / "protocolos_completos.txt").read_text(encoding="utf-8")
 # "SAL-001 — ..." seguido de "ID Subcategoría (BD): 1 — Urgencia"
 SUBCATEGORIA_DE = dict(re.findall(r"^((?:SAL|INF|SEG)-\d+) — .*?ID Subcategoría \(BD\): \d+ — ([^\n]+)",
@@ -80,7 +81,8 @@ def test_casos_riesgo_vital_bien_formados():
     assert 0.35 < positivos / len(CASOS) < 0.65  # set balanceado
 
 
-@pytest.mark.parametrize("escenarios", [ESCENARIOS_BASE, ESCENARIOS, ESCENARIOS_TEST3], ids=["base", "test2", "test3"])
+@pytest.mark.parametrize("escenarios", [ESCENARIOS_BASE, ESCENARIOS, ESCENARIOS_TEST3, ESCENARIOS_TEST4],
+                         ids=["base", "test2", "test3", "test4"])
 def test_escenarios_bien_formados(escenarios):
     ids = [e["id"] for e in escenarios]
     assert len(ids) == len(set(ids))
@@ -462,3 +464,44 @@ def test_aviso_escrito_por_el_modelo_se_reemplaza():
 def test_filtro_quita_avisaremos():
     assert rag.quitar_promesas("Vigila su respiración. Avisaremos al personal de salud.", "Recibido") == \
         "Vigila su respiración."
+
+
+def test_test4_agrega_validacion_de_telefonos_sin_tocar_test3():
+    test3 = {e["id"]: e for e in ESCENARIOS_TEST3}
+    nuevos = [e for e in ESCENARIOS_TEST4 if e["id"] not in test3]
+    assert all(e == test3[e["id"]] for e in ESCENARIOS_TEST4 if e["id"] in test3)
+    assert {e["id"] for e in nuevos} == {"SAL-001-V2", "SEG-004-V1", "INF-002-V1"}
+    assert all(e["conjunto"] == "validacion" for e in nuevos)
+
+
+@pytest.mark.parametrize("mensaje, categoria, esperado", [
+    ("me siento mareada, ¿me puedes dar el teléfono de salud de la universidad?", "Salud", ("CONTACTO_SALUD",)),
+    ("me robaron el notebook, ¿a qué número de seguridad de la U llamo?", "Seguridad", ("CONTACTO_SEGURIDAD",)),
+    ("se cortó la luz, ¿me das el teléfono de mantención?", "Infraestructura",
+     ("CONTACTO_INFRAESTRUCTURA", "CONTACTO_SEGURIDAD")),
+    ("¿a quién llamo?", "Salud", ("CONTACTO_SALUD",)),
+    ("¿a quién llamo?", "Seguridad", ("CONTACTO_SEGURIDAD",)),
+    ("cuál es el fono del policlínico", "Seguridad", ("CONTACTO_SALUD",)),
+    ("me pasas el anexo de la guardia", "Salud", ("CONTACTO_SEGURIDAD",)),
+    ("no contesta el teléfono y está en la U", "Salud", ()),
+    ("me robaron el celular en la sala", "Seguridad", ()),
+    ("está en la sala número 204", "Salud", ()),
+])
+def test_contacto_pedido(mensaje, categoria, esperado):
+    assert rag.contacto_pedido(mensaje, categoria) == tuple(getattr(rag, n) for n in esperado)
+
+
+def test_contacto_pedido_sin_falsos_positivos_en_los_casos_de_riesgo_vital():
+    """Ningún caso del set de riesgo vital pide un teléfono: el contacto no debe agregarse en ninguno."""
+    validacion = json.loads((DOCS / "casos_riesgo_vital_validacion.json").read_text(encoding="utf-8"))
+    for c in [*CASOS, *validacion]:
+        assert rag.contacto_pedido(c["mensaje"], c.get("categoria")) == (), c["mensaje"]
+
+
+def test_con_contacto_reemplaza_la_negativa_y_no_duplica():
+    texto = "No te puedo dar el teléfono de salud. Quédate sentada. Llama al +56 32 227 7888."
+    r = rag.con_contacto(texto, (rag.CONTACTO_SALUD,))
+    assert r == f"Quédate sentada. {rag.CONTACTO_SALUD}"
+    r = rag.con_contacto("No es necesario que llames a seguridad. No persigas a nadie.", (rag.CONTACTO_SEGURIDAD,))
+    assert r == f"No persigas a nadie. {rag.CONTACTO_SEGURIDAD}"
+    assert rag.con_contacto("Quédate sentada.", ()) == "Quédate sentada."

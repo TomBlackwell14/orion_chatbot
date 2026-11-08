@@ -41,15 +41,23 @@ MENSAJES_ESTADO = {
     "En_camino": "Un respondedor ya va en camino.",
 }
 
+# Contactos que entrega el código, con el texto exacto (GEN-000 sección 7). El modelo no los escribe: cuando la
+# persona pide un teléfono, contacto_pedido() agrega el que corresponde.
+CONTACTO_SALUD = "Teléfono de Salud de la sede (policlínico): +56 32 227 7888."
+CONTACTO_SEGURIDAD = "Teléfono de Seguridad de la sede: anexo 999 desde un teléfono interno, o +56 32 227 7999 desde celular."
+CONTACTO_INFRAESTRUCTURA = "No hay un teléfono de Mantenimiento para entregar: tu reporte ya quedó registrado y lo verá el personal."
+FRASES_FIJAS = (AVISO, *MENSAJES_ESTADO.values(), CONTACTO_SALUD, CONTACTO_SEGURIDAD, CONTACTO_INFRAESTRUCTURA)
+
 REGLAS_ORION = f"""REGLAS QUE NUNCA SE ROMPEN:
 - Tú solo orientas con texto. No ejecutas acciones en el sistema.
 - No digas que alguien fue notificado ni des tiempos de llegada.
 - No digas que el personal va en camino, salvo que el estado del incidente sea "En_camino" (entonces puedes decir
   que un respondedor ya va en camino, sin dar tiempos).
-- Tú no haces llamadas ni dices que llamarás o avisarás a alguien. Eso no impide que la persona llame: si pide un
-  teléfono o necesita comunicarse directamente, entrégale el contacto de la sede que corresponda: {CONTACTOS_SEDE}.
-  No existe un contacto de Infraestructura ni de Mantenimiento para entregar: si lo piden, dilo y recuerda que el
-  reporte ya quedó registrado. No menciones números de emergencia externos (131, 132, 133 u otros).
+- Tú no haces llamadas ni dices que llamarás o avisarás a alguien. Eso no impide que la persona llame: nunca le
+  digas que no llame, que no es necesario llamar ni que no puedes darle un teléfono. Si pide un teléfono, el sistema
+  agrega el contacto correcto al final de tu respuesta: no lo escribas tú. Si no lo pidió pero necesita comunicarse
+  directamente, puedes entregar el contacto de la sede: {CONTACTOS_SEDE}. No existe un contacto de Infraestructura
+  ni de Mantenimiento. No menciones números de emergencia externos (131, 132, 133 u otros).
 - No cambies ni sugieras cambiar la categoría, la subcategoría, la prioridad ni el respondedor.
 - No inventes rutas de evacuación, salidas, "la zona más cercana", distancias ni tiempos. Puedes recomendar alejarse
   del peligro y seguir la señalética y las indicaciones del personal o de las autoridades.
@@ -430,9 +438,10 @@ def _responder_con_modelo(mensajes: list[dict], contexto: dict, senales: list[st
     riesgo_modelo = _a_bool(datos.get("riesgo_vital", False))
     riesgo_detector = detector.result() if detector else None
     return {
-        "respuesta_texto": con_aviso(quitar_promesas(str(datos["respuesta_texto"]).strip(),
-                                                     contexto.get("estado_incidente")), mensajes,
-                                     contexto.get("estado_incidente")),
+        "respuesta_texto": con_aviso(
+            con_contacto(quitar_promesas(str(datos["respuesta_texto"]).strip(), contexto.get("estado_incidente")),
+                         contacto_pedido(mensajes[-1]["content"][0]["text"], contexto.get("categoria"))),
+            mensajes, contexto.get("estado_incidente")),
         # Reglas y detector solo pueden subir a true; nunca bajan lo que decidió el modelo
         "riesgo_vital": riesgo_modelo or bool(riesgo_detector) or bool(senales),
         "protocolo": str(protocolo) if protocolo else None,
@@ -450,6 +459,52 @@ _PROMESAS = re.compile(
     r"\b(?:avisaremos|notificaremos|alertaremos|llamaremos|vamos a (?:avisar|notificar|llamar))\b|"
     r"\b(?:en|dentro de)\s+(?:unos?\s+)?\d+\s*(?:min|minutos|segundos)\b|tiempo estimado|llegar[áa]n? en", re.IGNORECASE)
 _EN_CAMINO = re.compile(r"\b(?:va|van|viene|vienen|est[aá]n?)\s+(?:ya\s+)?en\s+camino\b", re.IGNORECASE)
+
+
+_TEL = r"(?:tel[eé]fonos?|n[uú]meros?|fonos?|anexos?|contactos?)"
+_PIDE_TELEFONO = re.compile(  # pedir un teléfono, no solo mencionarlo ("no contesta el teléfono", "me robaron el celular")
+    r"\b(?:dame|deme|me\s+das|me\s+da|me\s+pasas|p[aá]same|me\s+puedes\s+dar|me\s+podr[ií]as\s+dar|tienes|tiene|"
+    r"necesito|quiero|hay)\s+(?:el|la|los|un|una|alg[uú]n)?\s*" + _TEL + r"|"
+    r"\b(?:cu[aá]l|qu[eé])\s+(?:es\s+)?(?:el\s+)?" + _TEL + r"|"
+    r"\b" + _TEL + r"\s+(?:de|del|para)\s+(?:la\s+)?(?:seguridad|salud|emergencia|la\s+u\b|u\b|universidad|sede|"
+    r"mantenci|mantenimiento|guardia|policl)|"
+    r"\ba\s+(?:qui[eé]n|d[oó]nde|qu[eé]\s+n[uú]mero)\s+(?:llamo|puedo\s+llamar|tengo\s+que\s+llamar|debo\s+llamar|"
+    r"llamar|aviso)\b|\bc[oó]mo\s+(?:los\s+|las\s+|lo\s+|la\s+)?(?:llamo|contacto)\b", re.IGNORECASE)
+_PIDE_SALUD = re.compile(r"\b(?:salud|policl[ií]nico|m[eé]dic\w*|enfermer\w*|param[eé]dic\w*)\b", re.IGNORECASE)
+_PIDE_SEGURIDAD = re.compile(r"\b(?:seguridad|guardias?|vigilancia)\b", re.IGNORECASE)
+_PIDE_INFRA = re.compile(r"\b(?:mantenci[oó]n|mantenimiento|infraestructura|el[eé]ctric\w*|t[eé]cnico)\b", re.IGNORECASE)
+_NIEGA_CONTACTO = re.compile(
+    r"\bno\s+(?:te\s+|le\s+)?(?:puedo|podemos|tengo|cuento con)\b[^.?!]*\b(?:tel[eé]fono|n[uú]mero|contacto)|"
+    r"\bno\s+(?:es\s+necesario|hace\s+falta|necesitas)\s+(?:que\s+)?llam|\bno\s+llames\b", re.IGNORECASE)
+_NUMERO_SEDE = re.compile(r"227\s*7\s*(?:888|999)|\banexo\s*999\b", re.IGNORECASE)
+
+
+def contacto_pedido(mensaje_usuario: str, categoria: str | None) -> tuple[str, ...]:
+    """Si el usuario pide un teléfono, devuelve los contactos que corresponden (GEN-000 sección 7).
+    Primero manda lo que nombra el usuario (salud, seguridad, mantención); si no nombra nada, la categoría."""
+    if not _PIDE_TELEFONO.search(mensaje_usuario or ""):
+        return ()
+    if _PIDE_SALUD.search(mensaje_usuario):
+        return (CONTACTO_SALUD,)
+    if _PIDE_SEGURIDAD.search(mensaje_usuario):
+        return (CONTACTO_SEGURIDAD,)
+    if _PIDE_INFRA.search(mensaje_usuario) or (categoria or "").lower().startswith("infra"):
+        return (CONTACTO_INFRAESTRUCTURA, CONTACTO_SEGURIDAD)
+    if (categoria or "").lower() == "salud":
+        return (CONTACTO_SALUD,)
+    return (CONTACTO_SEGURIDAD,)
+
+
+def con_contacto(texto: str, contactos: tuple[str, ...]) -> str:
+    """Agrega los contactos pedidos con texto fijo. Quita las oraciones del modelo que niegan el contacto o que
+    traen un número de la sede (para no duplicarlo ni dejar una versión distinta)."""
+    if not contactos:
+        return texto
+    oraciones = re.split(r"(?<=[.!?])\s+", texto.strip())
+    quedan = [o for o in oraciones if not _NIEGA_CONTACTO.search(o) and not _NUMERO_SEDE.search(o)]
+    if len(quedan) != len(oraciones):
+        log.warning("se reemplazaron %d oraciones sobre contactos por el contacto fijo", len(oraciones) - len(quedan))
+    return " ".join([*quedan, *contactos]).strip()
 
 
 def quitar_promesas(texto: str, estado_incidente: str | None) -> str:

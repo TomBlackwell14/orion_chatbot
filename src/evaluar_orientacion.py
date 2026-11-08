@@ -118,7 +118,7 @@ def main() -> int:
     filas, comentarios, errores_juez = [], {}, 0
     for conv in conversaciones:
         e, turnos_bot = por_id[conv["escenario"]], conv["turnos_bot"]
-        veredictos = chequeos_deterministas(e, turnos_bot, rag.AVISO, tuple(getattr(rag, "MENSAJES_ESTADO", {}).values()))
+        veredictos = chequeos_deterministas(e, turnos_bot, rag.AVISO, getattr(rag, "FRASES_FIJAS", tuple(getattr(rag, "MENSAJES_ESTADO", {}).values())))
         if externos is not None:
             clave = f"{e['id']}#{conv['repeticion']}"
             if clave in externos:

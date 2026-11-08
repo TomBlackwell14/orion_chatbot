@@ -74,4 +74,31 @@ Cambios en el bot (`src/rag.py`), cada uno ligado a un problema del test 2:
 Cambios en la evaluación: el reporte muestra los resultados por conjunto (desarrollo y validación). El chequeo
 `sin_promesas` también detecta "avisaremos". Riesgo vital se vuelve a medir porque el prompt cambió.
 
+Resultado (corrida `orientacion_test3_2026-11-08_1403`, juez: Claude con el mismo método):
+- Aprobadas en los mismos 32 escenarios: 52/96 (test 2: 48/96; test 1: 36/96). En los 34 de desarrollo: 52/102.
+- Validación (8 escenarios nuevos): 15/24 aprobadas y ningún fallo crítico.
+- Conversaciones con fallo crítico en desarrollo: 7 (test 2: 9). Seguridad 99,5 %. Prioridad volvió a 92,9 %.
+- Volvieron a fallar los teléfonos (SAL-002-03, SEG-003-03) y sigue la evacuación ante el correo de bomba (SEG-002-01).
+  Fidelidad bajó a 85,8 %.
+- Riesgo vital sin regresión: recall 100 % en el set principal y en el de validación (300 casos).
+- Análisis completo: `analisis_test3.md`, junto a los resultados de la corrida.
+
+## Orientación — test 4 (teléfono por código, 2026-11-08)
+
+Problema del test 3: los teléfonos volvieron a fallar ("No te puedo dar el teléfono de salud", "No es necesario
+que llames a seguridad"). Eran 3 de los 7 fallos críticos. El prompt por sí solo no lo mantiene estable.
+
+Cambio en el bot (`src/rag.py`): el teléfono pasa a ser una frase fija, como el aviso.
+- `contacto_pedido()` detecta si el usuario pide un teléfono ("¿a qué número llamo?", "me das el teléfono de…",
+  "¿cuál es el fono…?"). Solo mencionarlo no cuenta ("no contesta el teléfono", "me robaron el celular"): se
+  verificó que no se activa en ninguno de los 452 casos de riesgo vital.
+- Elige el contacto por lo que nombra el usuario (salud, seguridad o guardias, mantención) y, si no nombra nada,
+  por la categoría del incidente. Mantención no tiene contacto: se dice eso y se agrega el de Seguridad.
+- `con_contacto()` agrega el contacto con texto fijo y borra las oraciones del modelo que lo niegan o que traen
+  un número de la sede escrito por el modelo (para no duplicarlo).
+- El prompt ahora dice que el sistema agrega el contacto y que nunca diga que no puede darlo ni que no llame.
+
+Escenarios: `docs/escenarios_orientacion_test4.json`: los 42 del test 3 sin cambios más 3 de validación nuevos donde
+la persona pide un teléfono (`SAL-001-V2`, `SEG-004-V1`, `INF-002-V1`).
+
 Resultado: pendiente.

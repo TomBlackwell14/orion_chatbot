@@ -232,3 +232,14 @@ def test_bedrock_cae_con_senal_explicita_responde_seguro(cliente):
     assert body["riesgo_vital"] is True
     assert body["modelo"] == "respuesta_segura"
     assert "+56 32 227 7999" in body["respuesta_texto"]
+
+
+def test_chat_pide_telefono_entrega_contacto_fijo(cliente):
+    """Aunque el modelo se niegue a dar el número, el código agrega el contacto de la sede que se pidió."""
+    c, _ = cliente('{"respuesta_texto": "No te puedo dar el teléfono de seguridad. Quédate en un lugar seguro.", '
+                   '"riesgo_vital": false, "protocolo": "SEG-003"}')
+    pedido = {**CHAT, "mensaje": "me robaron el notebook, ¿a qué número de seguridad de la U llamo?"}
+    texto = c.post("/v1/chat", json=pedido, headers=HEADERS).json()["respuesta_texto"]
+    assert rag.CONTACTO_SEGURIDAD in texto
+    assert "No te puedo dar" not in texto
+    assert "Quédate en un lugar seguro." in texto
